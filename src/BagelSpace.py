@@ -1,6 +1,7 @@
 import os
 import sys
 
+import numpy as np
 import pygame
 
 
@@ -8,27 +9,37 @@ DESIRED_RESOLUTION = (1280, 720)
 
 
 class SpaceShip(pygame.sprite.Sprite):
+    SPACE_SHIP_IS_LEFT = 1
+    SPACE_SHIP_IS_RIGHT = 2
     SPRITE_LEFT = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'data', 'ship.png'))
     SPRITE_RIGHT = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'data', 'ship.png'))
+    SPACE_SHIP_LEFT_BOUND = np.array([[0,0],[DESIRED_RESOLUTION[0] / 2, DESIRED_RESOLUTION[1]]])
     DEFAULT_VELOCITY = 3
+    MIDDLE_POS = DESIRED_RESOLUTION[0] / 2
 
-    def __init__(self, position):
+    def __init__(self, position, space_ship_side):
         super().__init__()
-        self.position = list(position)
-        self.velocity = [0, 0]
+        self.position = np.array(position)
+        self.space_ship_side = space_ship_side
+        if not any(self.SPACE_SHIP_LEFT_BOUND[0] <= self.position) or not any(self.position < self.SPACE_SHIP_LEFT_BOUND[1]):
+            raise ValueError
+        self.velocity = np.array([0, 0])
 
     def process_input(self, event):
         if event.type == pygame.JOYHATMOTION:
             if event.dict['hat'] == 0:
-                self.velocity[0] = self.DEFAULT_VELOCITY * event.dict['value'][0]
-                self.velocity[1] = self.DEFAULT_VELOCITY * event.dict['value'][1]
+                self.velocity = self.DEFAULT_VELOCITY * np.array(event.dict['value'])
         elif event.type == pygame.JOYBUTTONUP:
             pass
         elif event.type == pygame.JOYBUTTONDOWN:
             pass
 
-    def tick(self, *args):
-        pass
+    def tick(self, tick_count):
+        new_position = self.position + self.velocity
+        if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
+            self.position = np.clip(new_position, [0,0], [self.MIDDLE_POS,DESIRED_RESOLUTION[1]])
+        else:
+            self.position = np.clip(new_position, [self.MIDDLE_POS,0], DESIRED_RESOLUTION)
 
     def blit(self, screen):
         screen.blit(self.SPRITE_LEFT, self.position)
@@ -49,9 +60,9 @@ class SpaceBagels:
         elif event.dict['joy'] == 1:
             self.player_right.process_input(event)
 
-    def tick(self, *args):
-        self.player_left.tick(args)
-        self.player_right.tick(args)
+    def tick(self, tick_count):
+        self.player_left.tick(tick_count)
+        self.player_right.tick(tick_count)
         self.blit()
 
     def blit(self):
@@ -88,15 +99,12 @@ def main():
             elif event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            #else:
-                #print('Unhandled event: {}'.format(event))
 
         last_frametime += clock.tick()
         tick_count = last_frametime // target_frametime_ms
         last_frametime = last_frametime % target_frametime_ms
-        fps = clock.get_fps()
 
-        game.tick(fps, tick_count)
+        game.tick(tick_count)
         pygame.display.flip()
 
 
