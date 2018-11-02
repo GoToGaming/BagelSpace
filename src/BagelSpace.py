@@ -13,7 +13,10 @@ class SpaceShip(pygame.sprite.Sprite):
     SPACE_SHIP_IS_RIGHT = 2
     SPRITE_LEFT = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'data', 'ship.png'))
     SPRITE_RIGHT = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'data', 'ship.png'))
-    SPACE_SHIP_LEFT_BOUND = np.array([[0,0],[DESIRED_RESOLUTION[0] / 2, DESIRED_RESOLUTION[1]]])
+    SPACE_SHIP_LEFT_BOUND = np.array([[0,0],
+                                      np.array([DESIRED_RESOLUTION[0] / 2, DESIRED_RESOLUTION[1]]) - SPRITE_LEFT.get_size()])
+    SPACE_SHIP_RIGHT_BOUND = np.array([[DESIRED_RESOLUTION[0] / 2,0],
+                                      np.array(DESIRED_RESOLUTION) - SPRITE_LEFT.get_size()])
     DEFAULT_VELOCITY = 3
     MIDDLE_POS = DESIRED_RESOLUTION[0] / 2
 
@@ -21,14 +24,19 @@ class SpaceShip(pygame.sprite.Sprite):
         super().__init__()
         self.position = np.array(position)
         self.space_ship_side = space_ship_side
-        if not any(self.SPACE_SHIP_LEFT_BOUND[0] <= self.position) or not any(self.position < self.SPACE_SHIP_LEFT_BOUND[1]):
-            raise ValueError
+        if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
+            if any(self.SPACE_SHIP_LEFT_BOUND[0] > self.position) or any(self.position > self.SPACE_SHIP_LEFT_BOUND[1]):
+                raise ValueError
+        else:
+            if any(self.SPACE_SHIP_RIGHT_BOUND[0] > self.position) or any(self.position > self.SPACE_SHIP_RIGHT_BOUND[1]):
+                raise ValueError
         self.velocity = np.array([0, 0])
 
     def process_input(self, event):
         if event.type == pygame.JOYHATMOTION:
             if event.dict['hat'] == 0:
                 self.velocity = self.DEFAULT_VELOCITY * np.array(event.dict['value'])
+                self.velocity[1] *= -1
         elif event.type == pygame.JOYBUTTONUP:
             pass
         elif event.type == pygame.JOYBUTTONDOWN:
@@ -37,9 +45,9 @@ class SpaceShip(pygame.sprite.Sprite):
     def tick(self, tick_count):
         new_position = self.position + self.velocity
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
-            self.position = np.clip(new_position, [0,0], [self.MIDDLE_POS,DESIRED_RESOLUTION[1]])
+            self.position = np.clip(new_position, [0,0], np.array([self.MIDDLE_POS,DESIRED_RESOLUTION[1]])-self.SPRITE_LEFT.get_size())
         else:
-            self.position = np.clip(new_position, [self.MIDDLE_POS,0], DESIRED_RESOLUTION)
+            self.position = np.clip(new_position, [self.MIDDLE_POS,0], np.array(DESIRED_RESOLUTION)-self.SPRITE_RIGHT.get_size())
 
     def blit(self, screen):
         screen.blit(self.SPRITE_LEFT, self.position)
@@ -51,8 +59,8 @@ class SpaceBagels:
     def __init__(self, *args):
         self._screen = pygame.display.set_mode(DESIRED_RESOLUTION)
         pygame.display.set_caption('SpaceBagels')
-        self.player_left = SpaceShip((100, 360))
-        self.player_right = SpaceShip((1180, 360))
+        self.player_left = SpaceShip((100, 360), SpaceShip.SPACE_SHIP_IS_LEFT)
+        self.player_right = SpaceShip((1180, 360), SpaceShip.SPACE_SHIP_IS_RIGHT)
 
     def process_input(self, event):
         if event.dict['joy'] == 0:
