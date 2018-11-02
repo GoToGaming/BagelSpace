@@ -9,7 +9,7 @@ DESIRED_RESOLUTION = (1280, 720)
 
 
 class Missile(pygame.sprite.Sprite):
-    SPRITE = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'data', 'missile.png'))
+    SPRITE = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'img', 'machine_gun_bullet1.png'))
 
     def __init__(self, pos, vel):
         super().__init__()
@@ -27,7 +27,7 @@ class SpaceShip(pygame.sprite.Sprite):
     SPACE_SHIP_IS_LEFT = 1
     SPACE_SHIP_IS_RIGHT = 2
     SPRITE_LEFT = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'img', 'red_ship_1.png'))
-    SPRITE_RIGHT = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'data', 'ship.png'))
+    SPRITE_RIGHT = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'img', 'red_ship_1.png'))
     SPACE_SHIP_LEFT_BOUND = np.array([[0,0],
                                       np.array([DESIRED_RESOLUTION[0] / 2, DESIRED_RESOLUTION[1]]) - SPRITE_LEFT.get_size()])
     SPACE_SHIP_RIGHT_BOUND = np.array([[DESIRED_RESOLUTION[0] / 2,0],
