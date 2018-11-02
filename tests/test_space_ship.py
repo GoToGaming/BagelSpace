@@ -46,14 +46,14 @@ def test_left_space_ship_should_not_move_left():
     space_ship = BagelSpace.SpaceShip((0,0), BagelSpace.SpaceShip.SPACE_SHIP_IS_LEFT)
     move_left_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (-1, 0)})
     space_ship.process_input(move_left_event)
-    space_ship.tick(1)
+    space_ship.tick()
     assert all(space_ship.position == [0,0])
 
 def test_right_space_ship_should_not_move_left():
     space_ship = BagelSpace.SpaceShip((BagelSpace.SpaceShip.MIDDLE_POS,0), BagelSpace.SpaceShip.SPACE_SHIP_IS_RIGHT)
     move_left_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (-1, 0)})
     space_ship.process_input(move_left_event)
-    space_ship.tick(1)
+    space_ship.tick()
     assert all(space_ship.position == [BagelSpace.SpaceShip.MIDDLE_POS,0])
 
 def test_left_space_ship_should_not_move_right():
@@ -61,7 +61,7 @@ def test_left_space_ship_should_not_move_right():
     space_ship = BagelSpace.SpaceShip(pos, BagelSpace.SpaceShip.SPACE_SHIP_IS_LEFT)
     move_right_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (1, 0)})
     space_ship.process_input(move_right_event)
-    space_ship.tick(1)
+    space_ship.tick()
     assert all(space_ship.position == pos)
 
 def test_right_space_ship_should_not_move_right():
@@ -69,14 +69,14 @@ def test_right_space_ship_should_not_move_right():
     space_ship = BagelSpace.SpaceShip(pos, BagelSpace.SpaceShip.SPACE_SHIP_IS_RIGHT)
     move_right_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (1, 0)})
     space_ship.process_input(move_right_event)
-    space_ship.tick(1)
+    space_ship.tick()
     assert all(space_ship.position == pos)
 
 def test_left_space_ship_should_move_left():
     space_ship = BagelSpace.SpaceShip((BagelSpace.SpaceShip.DEFAULT_VELOCITY,0), BagelSpace.SpaceShip.SPACE_SHIP_IS_LEFT)
     move_left_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (-1, 0)})
     space_ship.process_input(move_left_event)
-    space_ship.tick(1)
+    space_ship.tick()
     assert all(space_ship.position == [0,0])
 
 def test_right_space_ship_should_move_left():
@@ -85,5 +85,5 @@ def test_right_space_ship_should_move_left():
         BagelSpace.SpaceShip.SPACE_SHIP_IS_RIGHT)
     move_left_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (-1, 0)})
     space_ship.process_input(move_left_event)
-    space_ship.tick(1)
+    space_ship.tick()
     assert all(space_ship.position == [BagelSpace.SpaceShip.MIDDLE_POS,0])

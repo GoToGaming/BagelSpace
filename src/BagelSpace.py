@@ -8,6 +8,21 @@ import pygame
 DESIRED_RESOLUTION = (1280, 720)
 
 
+class Missile(pygame.sprite.Sprite):
+    SPRITE_LEFT = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'data', 'missile.png'))
+
+    def __init__(self, pos):
+        super().__init__()
+        self.pos = np.array(pos)
+        self.velocity = np.array([0, 0])
+
+    def tick(self):
+        pass
+
+    def blit(self, screen):
+        pass
+
+
 class SpaceShip(pygame.sprite.Sprite):
     SPACE_SHIP_IS_LEFT = 1
     SPACE_SHIP_IS_RIGHT = 2
@@ -31,6 +46,7 @@ class SpaceShip(pygame.sprite.Sprite):
             if any(self.SPACE_SHIP_RIGHT_BOUND[0] > self.position) or any(self.position > self.SPACE_SHIP_RIGHT_BOUND[1]):
                 raise ValueError
         self.velocity = np.array([0, 0])
+        self.missiles = []
 
     def process_input(self, event):
         if event.type == pygame.JOYHATMOTION:
@@ -42,21 +58,25 @@ class SpaceShip(pygame.sprite.Sprite):
         elif event.type == pygame.JOYBUTTONDOWN:
             pass
 
-    def tick(self, tick_count):
+    def tick(self):
         new_position = self.position + self.velocity
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
             self.position = np.clip(new_position, [0,0], np.array([self.MIDDLE_POS,DESIRED_RESOLUTION[1]])-self.SPRITE_LEFT.get_size())
         else:
             self.position = np.clip(new_position, [self.MIDDLE_POS,0], np.array(DESIRED_RESOLUTION)-self.SPRITE_RIGHT.get_size())
+        for missile in self.missiles:
+            missile.tick()
 
     def blit(self, screen):
         screen.blit(self.SPRITE_LEFT, self.position)
+        for missile in self.missiles:
+            missile.blit(screen)
 
 
 class SpaceBagels:
     BACKGROUND = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'data', 'background.jpg'))
 
-    def __init__(self, *args):
+    def __init__(self):
         self._screen = pygame.display.set_mode(DESIRED_RESOLUTION)
         pygame.display.set_caption('SpaceBagels')
         self.player_left = SpaceShip((100, 360), SpaceShip.SPACE_SHIP_IS_LEFT)
@@ -69,14 +89,19 @@ class SpaceBagels:
             self.player_right.process_input(event)
 
     def tick(self, tick_count):
-        self.player_left.tick(tick_count)
-        self.player_right.tick(tick_count)
+        for tick in range(tick_count):
+            self.player_left.tick()
+            self.player_right.tick()
+            self.detect_collisions()
         self.blit()
 
     def blit(self):
         self._screen.blit(self.BACKGROUND, (0, 0))
         self.player_left.blit(self._screen)
         self.player_right.blit(self._screen)
+
+    def detect_collisions(self):
+        pass
 
 
 def main():
