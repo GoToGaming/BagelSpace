@@ -75,8 +75,10 @@ class SpaceShip(pygame.sprite.Sprite):
             missile_velocity = (-3, 0)
         if self.firing:
             self.missiles.append(Missile(self.position, missile_velocity))
-        for missile in self.missiles:
+        for missile in self.missiles.copy():
             missile.tick()
+            if 0 > missile.position[0] or missile.position[0] > DESIRED_RESOLUTION[0]:
+                self.missiles.remove(missile)
 
     def blit(self, screen):
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
