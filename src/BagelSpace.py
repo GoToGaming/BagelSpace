@@ -9,24 +9,24 @@ DESIRED_RESOLUTION = (1280, 720)
 
 
 class Missile(pygame.sprite.Sprite):
-    SPRITE_LEFT = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'data', 'missile.png'))
+    SPRITE = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'data', 'missile.png'))
 
-    def __init__(self, pos):
+    def __init__(self, pos, vel):
         super().__init__()
-        self.pos = np.array(pos)
-        self.velocity = np.array([0, 0])
+        self.position = np.array(pos)
+        self.velocity = np.array(vel)
 
     def tick(self):
-        pass
+        self.position += self.velocity
 
     def blit(self, screen):
-        pass
+        screen.blit(self.SPRITE, self.position)
 
 
 class SpaceShip(pygame.sprite.Sprite):
     SPACE_SHIP_IS_LEFT = 1
     SPACE_SHIP_IS_RIGHT = 2
-    SPRITE_LEFT = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'data', 'ship.png'))
+    SPRITE_LEFT = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'img', 'red_ship_1.png'))
     SPRITE_RIGHT = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'data', 'ship.png'))
     SPACE_SHIP_LEFT_BOUND = np.array([[0,0],
                                       np.array([DESIRED_RESOLUTION[0] / 2, DESIRED_RESOLUTION[1]]) - SPRITE_LEFT.get_size()])
@@ -46,6 +46,7 @@ class SpaceShip(pygame.sprite.Sprite):
             if any(self.SPACE_SHIP_RIGHT_BOUND[0] > self.position) or any(self.position > self.SPACE_SHIP_RIGHT_BOUND[1]):
                 raise ValueError
         self.velocity = np.array([0, 0])
+        self.firing = False
         self.missiles = []
 
     def process_input(self, event):
@@ -54,21 +55,28 @@ class SpaceShip(pygame.sprite.Sprite):
                 self.velocity = self.DEFAULT_VELOCITY * np.array(event.dict['value'])
                 self.velocity[1] *= -1
         elif event.type == pygame.JOYBUTTONUP:
-            pass
+            self.firing = False
         elif event.type == pygame.JOYBUTTONDOWN:
-            pass
+            self.firing = True
 
     def tick(self):
         new_position = self.position + self.velocity
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
             self.position = np.clip(new_position, [0,0], np.array([self.MIDDLE_POS,DESIRED_RESOLUTION[1]])-self.SPRITE_LEFT.get_size())
+            missile_velocity = (3, 0)
         else:
             self.position = np.clip(new_position, [self.MIDDLE_POS,0], np.array(DESIRED_RESOLUTION)-self.SPRITE_RIGHT.get_size())
+            missile_velocity = (-3, 0)
+        if self.firing:
+            self.missiles.append(Missile(self.position, missile_velocity))
         for missile in self.missiles:
             missile.tick()
 
     def blit(self, screen):
-        screen.blit(self.SPRITE_LEFT, self.position)
+        if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
+            screen.blit(self.SPRITE_LEFT, self.position)
+        else:
+            screen.blit(self.SPRITE_RIGHT, self.position)
         for missile in self.missiles:
             missile.blit(screen)
 
@@ -134,7 +142,7 @@ def main():
                 sys.exit()
 
         last_frametime += clock.tick()
-        tick_count = last_frametime // target_frametime_ms
+        tick_count = int(last_frametime // target_frametime_ms)
         last_frametime = last_frametime % target_frametime_ms
 
         game.tick(tick_count)
