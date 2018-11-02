@@ -22,6 +22,12 @@ class Missile(pygame.sprite.Sprite):
     def blit(self, screen):
         screen.blit(self.SPRITE, self.position)
 
+    @property
+    def rect(self):
+        rect = self.SPRITE.get_rect()
+        rect.x, rect.y = self.position
+        return rect
+
 
 class SpaceShip(pygame.sprite.Sprite):
     SPACE_SHIP_IS_LEFT = 1
@@ -80,6 +86,18 @@ class SpaceShip(pygame.sprite.Sprite):
         for missile in self.missiles:
             missile.blit(screen)
 
+    @property
+    def rect(self):
+        if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
+            rect = self.SPRITE_LEFT.get_rect()
+        else:
+            rect = self.SPRITE_RIGHT.get_rect()
+        rect.x, rect.y = self.position
+        return rect
+
+    def get_objects(self):
+        return [self, *self.missiles]
+
 
 class SpaceBagels:
     BACKGROUND = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'data', 'background.jpg'))
@@ -109,7 +127,12 @@ class SpaceBagels:
         self.player_right.blit(self._screen)
 
     def detect_collisions(self):
-        pass
+        player_left_objects = self.player_left.get_objects()
+        player_right_objects = self.player_right.get_objects()
+        if pygame.sprite.spritecollideany(self.player_left, player_right_objects):
+            print("Player Left hit")
+        if pygame.sprite.spritecollideany(self.player_right, player_left_objects):
+            print("Player Right hit")
 
 
 def main():
