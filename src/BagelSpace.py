@@ -8,31 +8,32 @@ DESIRED_RESOLUTION = (1280, 720)
 
 
 class SpaceBagels:
+    BACKGROUND = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'data', 'background.jpg'))
+
     def __init__(self, *args):
-        pass
+        self._screen = pygame.display.set_mode(DESIRED_RESOLUTION)
+        pygame.display.set_caption('SpaceBagels')
 
     def process_input(self, *args):
         pass
 
     def tick(self, *args):
-        pass
+        self.blit()
+
+    def blit(self):
+        self._screen.blit(self.BACKGROUND, (0, 0))
 
 
 def main():
     pygame.init()
-    pygame.key.set_repeat(1, 10)
 
     target_fps = 60
     target_frametime_ms = 1000. / target_fps
-
-    screen = pygame.display.set_mode(DESIRED_RESOLUTION)
-    pygame.display.set_caption('SpaceBagels')
-    background = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'data', 'background.jpg'))
+    last_frametime = 0
 
     clock = pygame.time.Clock()
 
-    game = SpaceBagels(screen)
-    last_frametime = 0
+    game = SpaceBagels()
 
     while 1:
         for event in pygame.event.get():
@@ -47,7 +48,6 @@ def main():
         last_frametime = last_frametime % target_frametime_ms
         fps = clock.get_fps()
 
-        screen.blit(background, (0, 0))
         game.tick(fps, tick_count)
         pygame.display.flip()
 
