@@ -33,7 +33,7 @@ class SpaceShip(pygame.sprite.Sprite):
     SPACE_SHIP_IS_LEFT = 1
     SPACE_SHIP_IS_RIGHT = 2
     SPRITE_LEFT = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'img', 'red_ship_1.png'))
-    SPRITE_RIGHT = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'img', 'red_ship_1.png'))
+    SPRITE_RIGHT = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'img', 'blue_ship.png'))
     SPACE_SHIP_LEFT_BOUND = np.array([[0,0],
                                       np.array([DESIRED_RESOLUTION[0] / 2, DESIRED_RESOLUTION[1]]) - SPRITE_LEFT.get_size()])
     SPACE_SHIP_RIGHT_BOUND = np.array([[DESIRED_RESOLUTION[0] / 2,0],
@@ -102,8 +102,6 @@ class SpaceShip(pygame.sprite.Sprite):
 
 
 class SpaceBagels:
-    BACKGROUND = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'data', 'background.jpg'))
-
     def __init__(self):
         self._screen = pygame.display.set_mode(DESIRED_RESOLUTION)
         pygame.display.set_caption('SpaceBagels')
@@ -124,7 +122,6 @@ class SpaceBagels:
         self.blit()
 
     def blit(self):
-        self._screen.blit(self.BACKGROUND, (0, 0))
         self.player_left.blit(self._screen)
         self.player_right.blit(self._screen)
 
