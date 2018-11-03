@@ -18,12 +18,14 @@ SPRITES = {}
 
 GAME_SCALE = 2
 
-SPACE_SHIP_VELOCITY = 5
-SPACE_SHIP_HIGHT = 100
+SPACE_SHIP_VELOCITY = 4
+SPACE_SHIP_HIGHT = 80
 
+MISSILE_VELOCITY = 5
+MISSILE_RELOAD_TIME_SEC = 0.4
 
 METEORITE_TARGET_COUNT = 10
-METEORITE_HIGHT = 80
+METEORITE_HIGHT = 60
 MIN_METEORITE_SPEED = 1
 MAX_METEORITE_SPEED = 4
 
@@ -118,7 +120,7 @@ class Animation:
 
 class Missile(pygame.sprite.Sprite):
     MISSILE_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'rocket')
-    reload_time_sec = 0.5
+    reload_time_sec = MISSILE_RELOAD_TIME_SEC
 
     def __init__(self, pos, velocity, is_right_player):
         super().__init__()
@@ -281,11 +283,11 @@ class SpaceShip(pygame.sprite.Sprite):
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
             self.position = np.clip(new_position, [0, 0],
                                     np.array([self.MIDDLE_POS, DESIRED_RESOLUTION[1]]) - self.sprite.get_size())
-            missile_velocity = (3, 0)
+            missile_velocity = (MISSILE_VELOCITY, 0)
         else:
             self.position = np.clip(new_position, [self.MIDDLE_POS, 0],
                                     np.array(DESIRED_RESOLUTION) - self.sprite.get_size())
-            missile_velocity = (-3, 0)
+            missile_velocity = (-MISSILE_VELOCITY, 0)
 
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
             is_right_player = False
