@@ -3,10 +3,10 @@ import sys
 from enum import Enum
 
 import numpy as np
+import random as rand
 import pygame
 import pygameMenu
 from pygameMenu.locals import *
-
 
 DESIRED_RESOLUTION = (1280, 720)
 GAME_SCALE = 2
@@ -75,7 +75,7 @@ def load_image(path, scale=1, animation=False, flip_x=False, flip_y=False, alpha
 
 class Animation:
 
-    def __init__(self, path, speed, scale=1, flip_x=False, flip_y=False, alpha = True):
+    def __init__(self, path, speed, scale=1, flip_x=False, flip_y=False, alpha=True):
         self.speed = speed
         self.counter = 0
         self.current_image = 0
@@ -117,6 +117,55 @@ class Missile(pygame.sprite.Sprite):
         return rect
 
 
+class MeteoriteController:
+    METEORITE_TARGET_COUNT = 15
+    meteorites = []
+
+    def tick(self):
+        if len(self.meteorites) < self.METEORITE_TARGET_COUNT:
+            self.spawn_meteorite()
+
+        for meteorite in self.meteorites:
+            meteorite.tick()
+            if 0 > meteorite.position[0] or meteorite.position[0] > DESIRED_RESOLUTION[0]:
+                self.meteorites.remove(meteorite)
+
+    def spawn_meteorite(self):
+        x = DESIRED_RESOLUTION[0] / 2
+        y = rand.randint(0, DESIRED_RESOLUTION[1])
+        direction = rand.choice([-1,1])
+        speed = (rand.random()*2)+1
+        meteorite = Meteorite((x, y), (speed*direction, 0));
+        self.meteorites.append(meteorite)
+
+    def blit(self, screen):
+        for meteorite in self.meteorites:
+            meteorite.blit(screen)
+
+
+class Meteorite(pygame.sprite.Sprite):
+    METEORITE_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'meteorite.png')
+
+    def __init__(self, pos, velocity):
+        super().__init__()
+        self.position = np.array(pos)
+        self.velocity = np.array(velocity)
+
+        self.sprite = load_image(self.METEORITE_FILE_NAME)
+
+    def tick(self):
+        self.position += self.velocity
+
+    def blit(self, screen):
+        screen.blit(self.sprite, self.position)
+
+    @property
+    def rect(self):
+        rect = self.sprite.get_rect()
+        rect.x, rect.y = self.position
+        return rect
+
+
 class SpaceShip(pygame.sprite.Sprite):
     SPACE_SHIP_IS_LEFT = 1
     SPACE_SHIP_IS_RIGHT = 2
@@ -134,11 +183,12 @@ class SpaceShip(pygame.sprite.Sprite):
         self.ship_destroyed = False
         self.reaming_reload_ticks = 0
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
-            self.space_ship_bound = np.array([[0,0],
-                                      np.array([DESIRED_RESOLUTION[0] / 2, DESIRED_RESOLUTION[1]]) - self.sprite.get_size()])
+            self.space_ship_bound = np.array([[0, 0],
+                                              np.array([DESIRED_RESOLUTION[0] / 2,
+                                                        DESIRED_RESOLUTION[1]]) - self.sprite.get_size()])
         else:
-            self.space_ship_bound = np.array([[DESIRED_RESOLUTION[0] / 2,0],
-                                       np.array(DESIRED_RESOLUTION) - self.sprite.get_size()])
+            self.space_ship_bound = np.array([[DESIRED_RESOLUTION[0] / 2, 0],
+                                              np.array(DESIRED_RESOLUTION) - self.sprite.get_size()])
         if any(self.space_ship_bound[0] > self.position) or any(self.position > self.space_ship_bound[1]):
             raise ValueError
         self.velocity = np.array([0, 0])
@@ -196,10 +246,12 @@ class SpaceShip(pygame.sprite.Sprite):
     def tick(self):
         new_position = self.position + self.velocity
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
-            self.position = np.clip(new_position, [0,0], np.array([self.MIDDLE_POS,DESIRED_RESOLUTION[1]])-self.sprite.get_size())
+            self.position = np.clip(new_position, [0, 0],
+                                    np.array([self.MIDDLE_POS, DESIRED_RESOLUTION[1]]) - self.sprite.get_size())
             missile_velocity = (3, 0)
         else:
-            self.position = np.clip(new_position, [self.MIDDLE_POS,0], np.array(DESIRED_RESOLUTION)-self.sprite.get_size())
+            self.position = np.clip(new_position, [self.MIDDLE_POS, 0],
+                                    np.array(DESIRED_RESOLUTION) - self.sprite.get_size())
             missile_velocity = (-3, 0)
 
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
@@ -245,6 +297,7 @@ class SpaceBagels:
         self.player_left = SpaceShip((200, 360), SpaceShip.SPACE_SHIP_IS_LEFT, player_left_sprite)
         player_right_sprite = load_image(SpaceShip.SPRITE_RIGHT_FILE_NAME, GAME_SCALE)
         self.player_right = SpaceShip((1000, 360), SpaceShip.SPACE_SHIP_IS_RIGHT, player_right_sprite)
+        self.meteorite_controller = MeteoriteController()
         self.running = True
         self.last_frametime = 0
         self.use_joystick = False
@@ -295,6 +348,7 @@ class SpaceBagels:
         for tick in range(tick_count):
             self.player_left.tick()
             self.player_right.tick()
+            self.meteorite_controller.tick()
             self.detect_collisions()
         self.blit()
 
@@ -320,7 +374,7 @@ class SpaceBagels:
         self.player_left.blit(self._screen)
         self.player_right.blit(self._screen)
         self.blit_status_bar()
-
+        self.meteorite_controller.blit(self._screen)
 
     def detect_collisions(self):
         player_left_objects = self.player_left.get_objects()
