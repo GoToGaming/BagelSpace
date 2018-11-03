@@ -42,7 +42,8 @@ class SpaceShip(pygame.sprite.Sprite):
         super().__init__()
         self.position = np.array(position)
         self.space_ship_side = space_ship_side
-        self.sprite = sprite
+        self.health_percentage = 100
+        self.ship_destroyed = False
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
             self.space_ship_bound = np.array([[0,0],
                                       np.array([DESIRED_RESOLUTION[0] / 2, DESIRED_RESOLUTION[1]]) - self.sprite.get_size()])
@@ -54,6 +55,20 @@ class SpaceShip(pygame.sprite.Sprite):
         self.velocity = np.array([0, 0])
         self.firing = False
         self.missiles = []
+
+    def damage_ship(self, health_percentage_div):
+        self.health_percentage -= int(health_percentage_div)
+        if self.health_percentage <= 0:
+            self.health_percentage = 0
+            self.ship_destroyed = True
+        return self.ship_destroyed
+
+    def increase_health_percentage(self, health_percentage_div):
+        new_health_percentage = self.health_percentage + int(health_percentage_div)
+        if new_health_percentage > 100:
+            self.health_percentage = 100
+        else:
+            self.health_percentage = new_health_percentage
 
     def process_input(self, event):
         if event.type == pygame.JOYHATMOTION:

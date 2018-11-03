@@ -56,6 +56,9 @@ def test_left_space_ship_should_not_move_left(test_sprite):
 
 def test_right_space_ship_should_not_move_left(test_sprite):
     space_ship = BagelSpace.SpaceShip((BagelSpace.SpaceShip.MIDDLE_POS,0), BagelSpace.SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite)
+
+def test_right_space_ship_should_not_move_left():
+    space_ship = BagelSpace.SpaceShip((BagelSpace.SpaceShip.MIDDLE_POS,0), BagelSpace.SpaceShip.SPACE_SHIP_IS_RIGHT)
     move_left_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (-1, 0)})
     space_ship.process_input(move_left_event)
     space_ship.tick()
@@ -64,6 +67,10 @@ def test_right_space_ship_should_not_move_left(test_sprite):
 def test_left_space_ship_should_not_move_right(test_sprite):
     pos = (BagelSpace.SpaceShip.MIDDLE_POS - test_sprite.get_size()[0], 0)
     space_ship = BagelSpace.SpaceShip(pos, BagelSpace.SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite)
+
+def test_left_space_ship_should_not_move_right():
+    pos = (BagelSpace.SpaceShip.MIDDLE_POS - BagelSpace.SpaceShip.SPRITE_LEFT.get_size()[0], 0)
+    space_ship = BagelSpace.SpaceShip(pos, BagelSpace.SpaceShip.SPACE_SHIP_IS_LEFT)
     move_right_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (1, 0)})
     space_ship.process_input(move_right_event)
     space_ship.tick()
@@ -72,6 +79,10 @@ def test_left_space_ship_should_not_move_right(test_sprite):
 def test_right_space_ship_should_not_move_right(test_sprite):
     pos = (BagelSpace.DESIRED_RESOLUTION[0] - test_sprite.get_size()[0], 0)
     space_ship = BagelSpace.SpaceShip(pos, BagelSpace.SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite)
+
+def test_right_space_ship_should_not_move_right():
+    pos = (BagelSpace.DESIRED_RESOLUTION[0] - BagelSpace.SpaceShip.SPRITE_RIGHT.get_size()[0], 0)
+    space_ship = BagelSpace.SpaceShip(pos, BagelSpace.SpaceShip.SPACE_SHIP_IS_RIGHT)
     move_right_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (1, 0)})
     space_ship.process_input(move_right_event)
     space_ship.tick()
@@ -81,10 +92,14 @@ def test_left_space_ship_should_move_left(test_sprite):
     space_ship = BagelSpace.SpaceShip((BagelSpace.SpaceShip.DEFAULT_VELOCITY,0),
                                       BagelSpace.SpaceShip.SPACE_SHIP_IS_LEFT,
                                       test_sprite)
+
+def test_left_space_ship_should_move_left():
+    space_ship = BagelSpace.SpaceShip((BagelSpace.SpaceShip.DEFAULT_VELOCITY,0), BagelSpace.SpaceShip.SPACE_SHIP_IS_LEFT)
     move_left_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (-1, 0)})
     space_ship.process_input(move_left_event)
     space_ship.tick()
     assert all(space_ship.position == [0,0])
+
 
 def test_right_space_ship_should_move_left(test_sprite):
     space_ship = BagelSpace.SpaceShip(
@@ -95,3 +110,26 @@ def test_right_space_ship_should_move_left(test_sprite):
     space_ship.process_input(move_left_event)
     space_ship.tick()
     assert all(space_ship.position == [BagelSpace.SpaceShip.MIDDLE_POS,0])
+
+
+def test_health_percentage_till_death():
+    space_ship = BagelSpace.SpaceShip(
+        (BagelSpace.SpaceShip.MIDDLE_POS + BagelSpace.SpaceShip.DEFAULT_VELOCITY, 0),
+        BagelSpace.SpaceShip.SPACE_SHIP_IS_RIGHT)
+    assert space_ship.health_percentage == 100
+
+    assert space_ship.damage_ship(health_percentage_div=50) is False
+    assert space_ship.health_percentage == 50
+
+    assert space_ship.damage_ship(health_percentage_div=80) is True
+    assert space_ship.health_percentage == 0
+
+
+def test_health_increase():
+    space_ship = BagelSpace.SpaceShip(
+        (BagelSpace.SpaceShip.MIDDLE_POS + BagelSpace.SpaceShip.DEFAULT_VELOCITY, 0),
+        BagelSpace.SpaceShip.SPACE_SHIP_IS_RIGHT)
+    space_ship.health_percentage = 50
+
+    space_ship.increase_health_percentage(health_percentage_div=90)
+    assert space_ship.health_percentage == 100
