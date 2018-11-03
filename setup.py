@@ -8,7 +8,9 @@ setup(
       author='GoToGaming',
       author_email='mario.girod@logmein.com, fabian.koller@logmein.com, martin.unzner@logmein.com, felix.wollert@logmein.com',
       install_requires=[
-            'pygame','numpy'
+            'pygame',
+            'pygame-menu',
+            'numpy'
       ],
      )
 

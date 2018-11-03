@@ -1,11 +1,16 @@
+import datetime
 import os
 import sys
 
 import numpy as np
 import pygame
+import pygameMenu
+from pygameMenu.locals import *
 
 
 DESIRED_RESOLUTION = (1280, 720)
+TARGET_FPS = 60
+TARGET_FRAMETIME_MS = 1000. / TARGET_FPS
 SPRITES = {}
 
 black = (0, 0, 0)
@@ -121,18 +126,54 @@ class SpaceShip(pygame.sprite.Sprite):
 class SpaceBagels:
     BACKGROUND_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'background.png')
 
-    def __init__(self, screen):
+    def __init__(self, screen, clock):
         self._screen = screen
+        self._clock = clock
         self.player_left = SpaceShip((100, 360), SpaceShip.SPACE_SHIP_IS_LEFT, SPRITES[SpaceShip.SPRITE_LEFT_FILE_NAME])
         self.player_right = SpaceShip((1180, 360), SpaceShip.SPACE_SHIP_IS_RIGHT, SPRITES[SpaceShip.SPRITE_RIGHT_FILE_NAME])
+        self.running = True
+        self.last_frametime = 0
+
+    def main(self, menu):
+        menu.disable()
+
+        while True:
+            playevents = pygame.event.get()
+            for e in playevents:
+                if e.type == pygame.QUIT:
+                    exit()
+                elif e.type == pygame.KEYDOWN:
+                    if e.key == pygame.K_ESCAPE and menu.is_disabled():
+                        menu.enable()
+
+                        # Quit this function, then skip to loop of main-menu on line 217
+                        return
+                else:
+                    self.process_input(e)
+
+            self.last_frametime += self._clock.tick()
+            tick_count = int(self.last_frametime // TARGET_FRAMETIME_MS)
+            self.last_frametime = self.last_frametime % TARGET_FRAMETIME_MS
+
+            self.tick(tick_count)
+            pygame.display.flip()
 
     def process_input(self, event):
-        if event.dict['joy'] == 0:
-            self.player_left.process_input(event)
-        elif event.dict['joy'] == 1:
-            self.player_right.process_input(event)
+        if not self.running:
+            return
+
+        if event.type in (pygame.KEYUP, pygame.KEYDOWN):
+            print('key input not implemented')
+        elif event.type in (pygame.JOYHATMOTION, pygame.JOYBUTTONUP, pygame.JOYBUTTONDOWN):
+            if event.dict['joy'] == 0:
+                self.player_left.process_input(event)
+            elif event.dict['joy'] == 1:
+                self.player_right.process_input(event)
 
     def tick(self, tick_count):
+        if not self.running:
+            return
+
         for tick in range(tick_count):
             self.player_left.tick()
             self.player_right.tick()
@@ -168,38 +209,51 @@ class SpaceBagels:
 
 
 class GameMenu:
-    def __init__(self, screen):
+    def __init__(self, screen, clock):
         self._screen = screen
-        self.game = SpaceBagels(self._screen)
+        self.game = SpaceBagels(self._screen, clock)
 
-    def process_input(self, event):
-        if event.type in (pygame.JOYHATMOTION, pygame.JOYBUTTONDOWN, pygame.JOYBUTTONUP):
-            self.game.process_input(event)
-        elif event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
+        def _main_menu_callback():
+            self._screen.fill((40, 0, 40))
+
+        self.menu = pygameMenu.Menu(self._screen,
+                                    bgfun=_main_menu_callback,
+                                    enabled=True,
+                                    font=pygameMenu.fonts.FONT_8BIT,
+                                    menu_alpha=90,
+                                    onclose=PYGAME_MENU_CLOSE,
+                                    title='BagelSpace',
+                                    window_width=DESIRED_RESOLUTION[0],
+                                    window_height=DESIRED_RESOLUTION[1])
+
+        self.menu.add_option('New Game', self.game.main, self.menu)
+        self.menu.add_option('Exit', PYGAME_MENU_EXIT)
+
+    def process_inputs(self, events):
+        for event in events:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                self.menu.enable()
+            if event.type in (pygame.KEYDOWN, pygame.KEYUP, pygame.JOYHATMOTION, pygame.JOYBUTTONDOWN, pygame.JOYBUTTONUP):
+                self.game.process_input(event)
+            elif event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+        self.menu.mainloop(events)
 
     def tick(self, tick_count):
-        self.game.tick(tick_count)
+        if self.game:
+            self.game.tick(tick_count)
 
     def blit(self):
-        self.game.blit()
+        if self.game:
+            self.game.blit()
 
     def select_input_method(self):
-        pygame.joystick.init()
-        if pygame.joystick.get_count() >= 2:
-            print('Keyboard or joystick?')
-        joysticks = [pygame.joystick.Joystick(idx) for idx in range(2)]
-        for joystick in joysticks:
-            joystick.init()
+        pass
 
 
 def main():
     pygame.init()
-
-    target_fps = 60
-    target_frametime_ms = 1000. / target_fps
-    last_frametime = 0
 
     clock = pygame.time.Clock()
 
@@ -211,19 +265,16 @@ def main():
     SPRITES[SpaceShip.SPRITE_RIGHT_FILE_NAME] = pygame.image.load(SpaceShip.SPRITE_RIGHT_FILE_NAME).convert_alpha()
     SPRITES[Missile.MISSILE_FILE_NAME] = pygame.image.load(Missile.MISSILE_FILE_NAME).convert_alpha()
 
-    menu = GameMenu(screen)
+    pygame.joystick.init()
+    joysticks = [pygame.joystick.Joystick(idx) for idx in range(pygame.joystick.get_count())]
+    for joystick in joysticks:
+        joystick.init()
 
-    menu.select_input_method()
+    menu = GameMenu(screen, clock)
 
     while True:
-        for event in pygame.event.get():
-            menu.process_input(event)
+        menu.process_inputs(pygame.event.get())
 
-        last_frametime += clock.tick()
-        tick_count = int(last_frametime // target_frametime_ms)
-        last_frametime = last_frametime % target_frametime_ms
-
-        menu.tick(tick_count)
         pygame.display.flip()
 
 
