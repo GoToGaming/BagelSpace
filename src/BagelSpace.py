@@ -190,6 +190,14 @@ class Meteorite(pygame.sprite.Sprite):
         rect.x, rect.y = self.position
         return rect
 
+    def damage_meteorite(self, diff):
+        self.health -= diff
+        if self.health <= 0:
+            self.health = 0
+            return True
+        return False
+
+
 
 class SpaceShip(pygame.sprite.Sprite):
     SPACE_SHIP_IS_LEFT = 'RED'
@@ -464,10 +472,31 @@ class SpaceBagels:
             self.player_right.damage_ship(health_percentage_diff=0.1)
 
     def compute_meteorite_missile_collisions(self):
-        pass
+        missiles_left = pygame.sprite.Group(missile for missile in self.player_left.missiles)
+        missiles_right = pygame.sprite.Group(missile for missile in self.player_right.missiles)
+        meteorites = pygame.sprite.Group(meteorite for meteorite in self.meteorite_controller.meteorites)
+
+        collision_dict_left = pygame.sprite.groupcollide(meteorites, missiles_left, False, True)
+        collision_dict_right = pygame.sprite.groupcollide(meteorites, missiles_right, False, True)
+
+        for meteorite, missiles in collision_dict_left.items():
+            if meteorite.damage_meteorite(50):
+                self.meteorite_controller.meteorites.remove(meteorite)
+        for meteorite, missiles in collision_dict_right.items():
+            if meteorite.damage_meteorite(50):
+                self.meteorite_controller.meteorites.remove(meteorite)
+
+        self.player_left.missiles = [missile for missile in missiles_left]
+        self.player_right.missiles = [missile for missile in missiles_right]
 
     def compute_missile_missile_collisions(self):
-        pass
+        missiles_left = pygame.sprite.Group(missile for missile in self.player_left.missiles)
+        missiles_right = pygame.sprite.Group(missile for missile in self.player_right.missiles)
+
+        pygame.sprite.groupcollide(missiles_left, missiles_right, True, True)
+
+        self.player_left.missiles = [missile for missile in missiles_left]
+        self.player_right.missiles = [missile for missile in missiles_right]
 
     def _set_input_method(self, use_joystick):
         self.use_joystick = use_joystick
