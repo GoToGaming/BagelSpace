@@ -14,15 +14,14 @@ class Main:
         self._screen = screen
         self._clock = clock
         self.background_sprite = Tools.load_image(Main.BACKGROUND_FILE_NAME, Constants.GAME_SCALE)
-        player_left_sprite = \
-            Tools.load_image(SpaceShip.SPRITE_LEFT_FILE_NAME, fixed_hight_pixels=Constants.SPACE_SHIP_HEIGHT)
+        player_left_sprite = Tools.load_image(SpaceShip.SPRITE_LEFT_FILE_NAME, fixed_hight_pixels=Constants.SPACE_SHIP_HEIGHT)
         self.player_left = SpaceShip((200, 360), SpaceShip.SPACE_SHIP_IS_LEFT, player_left_sprite)
-        player_right_sprite = \
-            Tools.load_image(SpaceShip.SPRITE_RIGHT_FILE_NAME, fixed_hight_pixels=Constants.SPACE_SHIP_HEIGHT)
+        player_right_sprite = Tools.load_image(SpaceShip.SPRITE_RIGHT_FILE_NAME, fixed_hight_pixels=Constants.SPACE_SHIP_HEIGHT)
         self.player_right = SpaceShip((1000, 360), SpaceShip.SPACE_SHIP_IS_RIGHT, player_right_sprite)
         self.meteorite_controller = MeteoriteController()
         self.running = True
         self.game_ended = ''
+        self.game_ended_time = 0
         self.last_frametime = 0
         self.use_joystick = False
 
@@ -57,8 +56,9 @@ class Main:
         if self.use_joystick:
             if event.type in (pygame.JOYHATMOTION, pygame.JOYBUTTONUP, pygame.JOYBUTTONDOWN):
                 if event.type == pygame.JOYBUTTONDOWN and self.game_ended:
-                    self.running = False
-                    return
+                    if self.game_ended_time + 2500 < pygame.time.get_ticks():
+                        self.running = False
+                        return
 
                 if event.dict['joy'] == 0:
                     self.player_left.process_input(event, None)
@@ -67,8 +67,9 @@ class Main:
         else:
             if event.type in (pygame.KEYUP, pygame.KEYDOWN):
                 if event.type == pygame.KEYDOWN and self.game_ended:
-                    self.running = False
-                    return
+                    if self.game_ended_time + 2500 < pygame.time.get_ticks():
+                        self.running = False
+                        return
 
                 if event.key in (pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d, pygame.K_SPACE):
                     self.player_left.process_input(event, Constants.KEYBOARD_MAPPING[event.key])
@@ -126,12 +127,13 @@ class Main:
                                 Constants.DESIRED_RESOLUTION[0] / 2,
                                 Constants.DESIRED_RESOLUTION[1] / 2,
                                 color=Constants.WHITE)
-        font_size = 40
-        self.draw_text_centered('Press any key to return to menu.'.format(winner),
-                                font_size,
-                                Constants.DESIRED_RESOLUTION[0] / 2,
-                                Constants.DESIRED_RESOLUTION[1] / 2 + 3 * font_size,
-                                color=Constants.WHITE)
+        if self.game_ended_time + 2500 < pygame.time.get_ticks():
+            font_size = 40
+            self.draw_text_centered('Press any key to return to menu.'.format(winner),
+                                    font_size,
+                                    Constants.DESIRED_RESOLUTION[0] / 2,
+                                    Constants.DESIRED_RESOLUTION[1] / 2 + 3 * font_size,
+                                    color=Constants.WHITE)
 
     def _blit_status_bar(self):
         self.draw_text_centered(f'{int(np.ceil(self.player_left.health_percentage))}%',
@@ -153,8 +155,10 @@ class Main:
 
         if self.player_left.health_percentage == 0:
             self.game_ended = SpaceShip.SPACE_SHIP_IS_RIGHT
-        if self.player_right.health_percentage == 0:
+        elif self.player_right.health_percentage == 0:
             self.game_ended = SpaceShip.SPACE_SHIP_IS_LEFT
+        if self.game_ended:
+            self.game_ended_time = pygame.time.get_ticks()
 
     def compute_missile_ship_collisions(self):
         player_left_objects = self.player_left.get_objects()
