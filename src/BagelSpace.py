@@ -9,6 +9,7 @@ from pygameMenu.locals import *
 
 
 DESIRED_RESOLUTION = (1280, 720)
+GAME_SCALE = 2
 TARGET_FPS = 60
 TARGET_FRAMETIME_MS = 1000. / TARGET_FPS
 SPRITES = {}
@@ -21,23 +22,76 @@ blue = (0, 0, 255)
 yellow = (255, 255, 0)
 
 
+def load_image(path, scale=1, animation=False, flip_x=False, flip_y=False, alpha=True):
+    if not animation:
+        image = pygame.image.load(path)
+        image = pygame.transform.scale(image, [x * scale for x in image.get_size()])
+        image = pygame.transform.flip(image, flip_x, flip_y)
+        if alpha:
+            image = image.convert_alpha()
+        else:
+            image = image.convert()
+        return image
+    else:
+        animation_array = []
+        counter = 1
+        while animation:
+            try:
+                image = pygame.image.load(path + str(counter) + ".png")
+                image = pygame.transform.scale(image, [x * scale for x in image.get_size()])
+                image = pygame.transform.flip(image, flip_x, flip_y)
+                if alpha:
+                    image = image.convert_alpha()
+                else:
+                    image = image.convert()
+                animation_array.append(image)
+                counter += 1
+            except pygame.error:
+                if len(animation_array) > 0:
+                    return animation_array
+                else:
+                    raise FileNotFoundError
+
+
+class Animation:
+
+    def __init__(self, path, speed, scale=1, flip_x=False, flip_y=False, alpha = True):
+        self.speed = speed
+        self.counter = 0
+        self.current_image = 0
+        self.animation = load_image(path, scale=scale, animation=True, flip_x=flip_x, flip_y=flip_y, alpha=alpha)
+
+    def update(self):
+        self.counter += 1
+        if self.counter >= self.speed:
+            self.current_image += 1
+            self.counter = 0
+            self.current_image = self.current_image % len(self.animation)
+
+    def get_current_image(self):
+        return self.animation[self.current_image]
+
+
 class Missile(pygame.sprite.Sprite):
-    MISSILE_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'machine_gun_bullet1.png')
+    MISSILE_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'rocket')
 
     def __init__(self, pos, velocity):
         super().__init__()
         self.position = np.array(pos)
         self.velocity = np.array(velocity)
 
+        self.animation = Animation(self.MISSILE_FILE_NAME, 4, GAME_SCALE)
+
     def tick(self):
         self.position += self.velocity
+        self.animation.update()
 
     def blit(self, screen):
-        screen.blit(SPRITES[self.MISSILE_FILE_NAME], self.position)
+        screen.blit(self.animation.get_current_image(), self.position)
 
     @property
     def rect(self):
-        rect = SPRITES[self.MISSILE_FILE_NAME].get_rect()
+        rect = self.animation.get_current_image().get_rect()
         rect.x, rect.y = self.position
         return rect
 
@@ -50,11 +104,11 @@ class SpaceShip(pygame.sprite.Sprite):
     DEFAULT_VELOCITY = 3
     MIDDLE_POS = DESIRED_RESOLUTION[0] / 2
 
-    def __init__(self, position, space_ship_side, sprite):
+    def __init__(self, position, space_ship_side, sprite_path):
         super().__init__()
         self.position = np.array(position)
         self.space_ship_side = space_ship_side
-        self.sprite = sprite
+        self.sprite = load_image(sprite_path, GAME_SCALE)
         self.health_percentage = 100
         self.ship_destroyed = False
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
@@ -132,8 +186,8 @@ class SpaceBagels:
     def __init__(self, screen, clock):
         self._screen = screen
         self._clock = clock
-        self.player_left = SpaceShip((100, 360), SpaceShip.SPACE_SHIP_IS_LEFT, SPRITES[SpaceShip.SPRITE_LEFT_FILE_NAME])
-        self.player_right = SpaceShip((1180, 360), SpaceShip.SPACE_SHIP_IS_RIGHT, SPRITES[SpaceShip.SPRITE_RIGHT_FILE_NAME])
+        self.player_left = SpaceShip((200, 360), SpaceShip.SPACE_SHIP_IS_LEFT, SpaceShip.SPRITE_LEFT_FILE_NAME)
+        self.player_right = SpaceShip((1000, 360), SpaceShip.SPACE_SHIP_IS_RIGHT, SpaceShip.SPRITE_RIGHT_FILE_NAME)
         self.running = True
         self.last_frametime = 0
 
@@ -269,10 +323,7 @@ def main():
     screen = pygame.display.set_mode(DESIRED_RESOLUTION)
     pygame.display.set_caption('SpaceBagels')
 
-    SPRITES[SpaceBagels.BACKGROUND_FILE_NAME] = pygame.transform.scale(pygame.image.load(SpaceBagels.BACKGROUND_FILE_NAME), DESIRED_RESOLUTION).convert()
-    SPRITES[SpaceShip.SPRITE_LEFT_FILE_NAME] = pygame.image.load(SpaceShip.SPRITE_LEFT_FILE_NAME).convert_alpha()
-    SPRITES[SpaceShip.SPRITE_RIGHT_FILE_NAME] = pygame.image.load(SpaceShip.SPRITE_RIGHT_FILE_NAME).convert_alpha()
-    SPRITES[Missile.MISSILE_FILE_NAME] = pygame.image.load(Missile.MISSILE_FILE_NAME).convert_alpha()
+    SPRITES[SpaceBagels.BACKGROUND_FILE_NAME] = load_image(SpaceBagels.BACKGROUND_FILE_NAME, GAME_SCALE)
 
     pygame.joystick.init()
     joysticks = [pygame.joystick.Joystick(idx) for idx in range(pygame.joystick.get_count())]
