@@ -196,7 +196,7 @@ class SpaceShip(pygame.sprite.Sprite):
         self.missiles = []
 
     def damage_ship(self, health_percentage_div):
-        self.health_percentage -= int(health_percentage_div)
+        self.health_percentage -= health_percentage_div
         if self.health_percentage <= 0:
             self.health_percentage = 0
             self.ship_destroyed = True
@@ -380,17 +380,27 @@ class SpaceBagels:
         player_left_objects = self.player_left.get_objects()
         player_right_objects = self.player_right.get_objects()
 
+        # Missiles
         hit_left_player = pygame.sprite.spritecollideany(self.player_left, player_right_objects)
         if hit_left_player:
-            print("Player Left hit")
             self.player_right.missile_has_collided(hit_left_player)
             self.player_left.damage_ship(health_percentage_div=10)
 
         hit_right_player = pygame.sprite.spritecollideany(self.player_right, player_left_objects)
         if pygame.sprite.spritecollideany(self.player_right, player_left_objects):
-            print("Player Right hit")
             self.player_left.missile_has_collided(hit_right_player)
             self.player_right.damage_ship(health_percentage_div=10)
+
+        # Meteorites
+        meteorites = self.meteorite_controller.meteorites
+
+        hit_left_player = pygame.sprite.spritecollideany(self.player_left, meteorites)
+        if hit_left_player:
+            self.player_left.damage_ship(health_percentage_div=0.1)
+
+        hit_right_player = pygame.sprite.spritecollideany(self.player_right, meteorites)
+        if hit_right_player:
+            self.player_right.damage_ship(health_percentage_div=0.1)
 
     def _set_input_method(self, use_joystick):
         self.use_joystick = use_joystick
