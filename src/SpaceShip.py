@@ -4,6 +4,7 @@ import pygame
 
 from src import Constants
 from src.Missile import Missile
+from src.Weapons import MachineGun
 
 
 class SpaceShip(pygame.sprite.Sprite):
@@ -34,6 +35,9 @@ class SpaceShip(pygame.sprite.Sprite):
         self.velocity = np.array([0, 0])
         self.firing = False
         self.missiles = []
+        self.weapons = []
+        self.weapons.append(MachineGun(self.space_ship_side == self.SPACE_SHIP_IS_RIGHT, Constants.SPACE_SHIP_HEIGHT/10))
+        self.weapons.append(MachineGun(self.space_ship_side == self.SPACE_SHIP_IS_RIGHT, -Constants.SPACE_SHIP_HEIGHT/10))
 
     def damage_ship(self, health_percentage_diff):
         self.health_percentage -= health_percentage_diff
@@ -88,22 +92,16 @@ class SpaceShip(pygame.sprite.Sprite):
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
             self.position = np.clip(new_position, [0, 0],
                                     np.array([self.MIDDLE_POS, Constants.DESIRED_RESOLUTION[1]]) - self.sprite.get_size())
-            missile_velocity = (Constants.MISSILE_VELOCITY, 0)
         else:
             self.position = np.clip(new_position, [self.MIDDLE_POS, 0],
                                     np.array(Constants.DESIRED_RESOLUTION) - self.sprite.get_size())
-            missile_velocity = (-Constants.MISSILE_VELOCITY, 0)
 
-        if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
-            is_right_player = False
-        else:
-            is_right_player = True
+        for weapon in self.weapons:
+            weapon.tick()
 
-        if self.rearming_reload_ticks > 0:
-            self.rearming_reload_ticks -= 1
-        if self.firing and self.rearming_reload_ticks <= 0:
-            self.missiles.append(Missile(self.calculate_missile_start_pos(), missile_velocity, is_right_player))
-            self.rearming_reload_ticks = int(Missile.RELOAD_TIME_SEC * 60)
+            if self.firing:
+                weapon.fire(self.calculate_missile_start_pos())
+
         for missile in self.missiles.copy():
             missile.tick()
             if 0 > missile.position[0] or missile.position[0] > Constants.DESIRED_RESOLUTION[0]:
@@ -116,6 +114,8 @@ class SpaceShip(pygame.sprite.Sprite):
         screen.blit(self.sprite, self.position)
         for missile in self.missiles:
             missile.blit(screen)
+        for weapon in self.weapons:
+            weapon.blit(screen)
 
     @property
     def rect(self):
