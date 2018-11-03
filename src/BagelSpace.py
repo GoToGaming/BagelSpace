@@ -19,18 +19,15 @@ SPRITES = {}
 GAME_SCALE = 2
 
 SPACE_SHIP_VELOCITY = 5
-SPACE_SHIP_HIGHT = 100
+SPACE_SHIP_HEIGHT = 100
 
 
 METEORITE_TARGET_COUNT = 10
-METEORITE_HIGHT = 80
+METEORITE_HEIGHT = 80
 MIN_METEORITE_SPEED = 1
 MAX_METEORITE_SPEED = 4
 
-
-
 # ###################################################################################################
-
 
 
 class Button(Enum):
@@ -118,7 +115,7 @@ class Animation:
 
 class Missile(pygame.sprite.Sprite):
     MISSILE_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'rocket')
-    reload_time_sec = 0.5
+    RELOAD_TIME_SEC = 0.5
 
     def __init__(self, pos, velocity, is_right_player):
         super().__init__()
@@ -176,7 +173,7 @@ class Meteorite(pygame.sprite.Sprite):
         self.velocity = np.array(velocity)
         self.health = 100.
 
-        self.sprite = load_image(self.METEORITE_FILE_NAME, fixed_hight_pixels=METEORITE_HIGHT)
+        self.sprite = load_image(self.METEORITE_FILE_NAME, fixed_hight_pixels=METEORITE_HEIGHT)
 
     def tick(self):
         self.position += self.velocity
@@ -196,7 +193,6 @@ class Meteorite(pygame.sprite.Sprite):
             self.health = 0
             return True
         return False
-
 
 
 class SpaceShip(pygame.sprite.Sprite):
@@ -296,7 +292,7 @@ class SpaceShip(pygame.sprite.Sprite):
             self.rearming_reload_ticks -= 1
         if self.firing and self.rearming_reload_ticks <= 0:
             self.missiles.append(Missile(self.calculate_missile_start_pos(), missile_velocity, is_right_player))
-            self.rearming_reload_ticks = int(Missile.reload_time_sec * 60)
+            self.rearming_reload_ticks = int(Missile.RELOAD_TIME_SEC * 60)
         for missile in self.missiles.copy():
             missile.tick()
             if 0 > missile.position[0] or missile.position[0] > DESIRED_RESOLUTION[0]:
@@ -326,9 +322,9 @@ class SpaceBagels:
     def __init__(self, screen, clock):
         self._screen = screen
         self._clock = clock
-        player_left_sprite = load_image(SpaceShip.SPRITE_LEFT_FILE_NAME,  fixed_hight_pixels=SPACE_SHIP_HIGHT)
+        player_left_sprite = load_image(SpaceShip.SPRITE_LEFT_FILE_NAME, fixed_hight_pixels=SPACE_SHIP_HEIGHT)
         self.player_left = SpaceShip((200, 360), SpaceShip.SPACE_SHIP_IS_LEFT, player_left_sprite)
-        player_right_sprite = load_image(SpaceShip.SPRITE_RIGHT_FILE_NAME,  fixed_hight_pixels=SPACE_SHIP_HIGHT)
+        player_right_sprite = load_image(SpaceShip.SPRITE_RIGHT_FILE_NAME, fixed_hight_pixels=SPACE_SHIP_HEIGHT)
         self.player_right = SpaceShip((1000, 360), SpaceShip.SPACE_SHIP_IS_RIGHT, player_right_sprite)
         self.meteorite_controller = MeteoriteController()
         self.running = True
