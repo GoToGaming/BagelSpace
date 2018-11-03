@@ -57,7 +57,7 @@ def load_image(path, scale=1, animation=False, flip_x=False, flip_y=False, alpha
         counter = 1
         while animation:
             try:
-                image = pygame.image.load(path + str(counter) + ".png")
+                image = pygame.image.load("{}{}.png".format(path, str(counter)))
                 image = pygame.transform.scale(image, [x * scale for x in image.get_size()])
                 image = pygame.transform.flip(image, flip_x, flip_y)
                 if alpha:
@@ -75,11 +75,11 @@ def load_image(path, scale=1, animation=False, flip_x=False, flip_y=False, alpha
 
 class Animation:
 
-    def __init__(self, path, speed, scale=1, flip_x=False, flip_y=False, alpha=True):
+    def __init__(self, sprites, speed):
         self.speed = speed
         self.counter = 0
         self.current_image = 0
-        self.animation = load_image(path, scale=scale, animation=True, flip_x=flip_x, flip_y=flip_y, alpha=alpha)
+        self.animation = sprites
 
     def update(self):
         self.counter += 1
@@ -101,7 +101,7 @@ class Missile(pygame.sprite.Sprite):
         self.position = np.array(pos)
         self.velocity = np.array(velocity)
 
-        self.animation = Animation(self.MISSILE_FILE_NAME, 4, GAME_SCALE, flip_x=is_right_player)
+        self.animation = Animation(load_image(self.MISSILE_FILE_NAME, GAME_SCALE, animation=True, flip_x=is_right_player), 4)
 
     def tick(self):
         self.position += self.velocity
