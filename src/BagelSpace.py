@@ -125,11 +125,11 @@ class SpaceShip(pygame.sprite.Sprite):
     DEFAULT_VELOCITY = 3
     MIDDLE_POS = DESIRED_RESOLUTION[0] / 2
 
-    def __init__(self, position, space_ship_side, sprite_path):
+    def __init__(self, position, space_ship_side, sprite):
         super().__init__()
         self.position = np.array(position)
         self.space_ship_side = space_ship_side
-        self.sprite = load_image(sprite_path, GAME_SCALE)
+        self.sprite = sprite
         self.health_percentage = 100
         self.ship_destroyed = False
         self.reaming_reload_ticks = 0
@@ -241,8 +241,10 @@ class SpaceBagels:
     def __init__(self, screen, clock):
         self._screen = screen
         self._clock = clock
-        self.player_left = SpaceShip((200, 360), SpaceShip.SPACE_SHIP_IS_LEFT, SpaceShip.SPRITE_LEFT_FILE_NAME)
-        self.player_right = SpaceShip((1000, 360), SpaceShip.SPACE_SHIP_IS_RIGHT, SpaceShip.SPRITE_RIGHT_FILE_NAME)
+        player_left_sprite = load_image(SpaceShip.SPRITE_LEFT_FILE_NAME, GAME_SCALE)
+        self.player_left = SpaceShip((200, 360), SpaceShip.SPACE_SHIP_IS_LEFT, player_left_sprite)
+        player_right_sprite = load_image(SpaceShip.SPRITE_RIGHT_FILE_NAME, GAME_SCALE)
+        self.player_right = SpaceShip((1000, 360), SpaceShip.SPACE_SHIP_IS_RIGHT, player_right_sprite)
         self.running = True
         self.last_frametime = 0
         self.use_joystick = False
@@ -412,7 +414,6 @@ class GameMenu:
                 pygame.quit()
                 sys.exit()
         self.menu.mainloop(events)
-
 
 
 def main():
