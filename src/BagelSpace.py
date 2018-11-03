@@ -94,7 +94,7 @@ class Animation:
 
 class Missile(pygame.sprite.Sprite):
     MISSILE_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'rocket')
-    reload_time_sec = 0.05
+    reload_time_sec = 0.5
 
     def __init__(self, pos, velocity, is_right_player):
         super().__init__()
@@ -361,7 +361,8 @@ class SpaceBagels:
             self.player_left.tick()
             self.player_right.tick()
             self.meteorite_controller.tick()
-            self._detect_collisions()
+            if not self.game_ended:
+                self._detect_collisions()
         self.blit()
 
     def draw_text_centered(self, string, size, x_middle, y_middle, color=YELLOW):
