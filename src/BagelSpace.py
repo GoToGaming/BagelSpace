@@ -191,20 +191,18 @@ class SpaceBagels:
         self.running = True
         self.last_frametime = 0
 
-    def main(self, menu):
-        menu.disable()
+    def main(self):
+        self.running = True
+        self._clock.tick()
 
         while True:
             playevents = pygame.event.get()
             for e in playevents:
                 if e.type == pygame.QUIT:
                     exit()
-                elif e.type == pygame.KEYDOWN:
-                    if e.key == pygame.K_ESCAPE and menu.is_disabled():
-                        menu.enable()
-
-                        # Quit this function, then skip to loop of main-menu on line 217
-                        return
+                elif e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
+                    self.running = False
+                    return
                 else:
                     self.process_input(e)
 
@@ -279,37 +277,35 @@ class GameMenu:
         def _main_menu_callback():
             self._screen.fill((40, 0, 40))
 
+        def _resume_callback():
+            self.menu.disable()
+            self.game.main()
+
+        def _new_game_callback():
+            self.menu.disable()
+            self.game = SpaceBagels(self._screen, clock)
+            self.game.main()
+
         self.menu = pygameMenu.Menu(self._screen,
                                     bgfun=_main_menu_callback,
                                     enabled=True,
                                     font=pygameMenu.fonts.FONT_8BIT,
                                     menu_alpha=90,
-                                    onclose=PYGAME_MENU_CLOSE,
+                                    onclose=_resume_callback,
                                     title='BagelSpace',
                                     window_width=DESIRED_RESOLUTION[0],
                                     window_height=DESIRED_RESOLUTION[1])
 
-        self.menu.add_option('New Game', self.game.main, self.menu)
+        self.menu.add_option('New Game', _new_game_callback)
         self.menu.add_option('Exit', PYGAME_MENU_EXIT)
 
     def process_inputs(self, events):
+        self.menu.enable()
         for event in events:
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                self.menu.enable()
-            if event.type in (pygame.KEYDOWN, pygame.KEYUP, pygame.JOYHATMOTION, pygame.JOYBUTTONDOWN, pygame.JOYBUTTONUP):
-                self.game.process_input(event)
-            elif event.type == pygame.QUIT:
+            if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
         self.menu.mainloop(events)
-
-    def tick(self, tick_count):
-        if self.game:
-            self.game.tick(tick_count)
-
-    def blit(self):
-        if self.game:
-            self.game.blit()
 
     def select_input_method(self):
         pass
