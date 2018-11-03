@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import pygame
+from pygameMenu.fonts import FONT_8BIT
 
 from src import Constants, Tools
 from src.SpaceShip import SpaceShip
@@ -89,14 +90,14 @@ class Main:
         self.blit()
 
     def draw_text_centered(self, string, size, x_middle, y_middle, color=Constants.YELLOW):
-        font = pygame.font.Font('freesansbold.ttf', size)
+        font = pygame.font.Font(FONT_8BIT, size)
         text_surface = font.render(string, True, color)
         text_rect = text_surface.get_rect()
         text_rect.center = (x_middle, y_middle)
         self._screen.blit(text_surface, text_rect)
 
     def draw_text_left_edge(self, string, size, x, y, color=Constants.YELLOW):
-        font = pygame.font.Font('freesansbold.ttf', size)
+        font = pygame.font.Font(FONT_8BIT, size)
         text_surface = font.render(string, True, color)
         self._screen.blit(text_surface, (x, y))
 
@@ -113,11 +114,11 @@ class Main:
 
     def _blit_game_ended_screen(self):
         res = np.array(Constants.DESIRED_RESOLUTION)
-        rect = pygame.Rect(res/4, res/2)
+        rect = pygame.Rect(res/8, res*(6/8))
         self._screen.fill((0, 0, 0), rect)
         winner = self.game_ended
-        font_size = 80
-        self.draw_text_centered('Game over!',
+        font_size = 60
+        self.draw_text_centered('Game over',
                                 font_size,
                                 Constants.DESIRED_RESOLUTION[0] / 2,
                                 Constants.DESIRED_RESOLUTION[1] / 2 - font_size,
@@ -128,20 +129,20 @@ class Main:
                                 Constants.DESIRED_RESOLUTION[1] / 2,
                                 color=Constants.WHITE)
         if self.game_ended_time + 2500 < pygame.time.get_ticks():
-            font_size = 40
-            self.draw_text_centered('Press any key to return to menu.'.format(winner),
+            font_size = 30
+            self.draw_text_centered('Press any key to return to menu'.format(winner),
                                     font_size,
                                     Constants.DESIRED_RESOLUTION[0] / 2,
                                     Constants.DESIRED_RESOLUTION[1] / 2 + 3 * font_size,
                                     color=Constants.WHITE)
 
     def _blit_status_bar(self):
-        self.draw_text_centered(f'{int(np.ceil(self.player_left.health_percentage))}%',
+        self.draw_text_centered(f'{int(np.ceil(self.player_left.health_percentage))} HP',
                                 30,
                                 Constants.DESIRED_RESOLUTION[0] / 4,
                                 15,
                                 color=Constants.RED)
-        self.draw_text_centered(f'{int(np.ceil(self.player_right.health_percentage))}%',
+        self.draw_text_centered(f'{int(np.ceil(self.player_right.health_percentage))} HP',
                                 30,
                                 3 * Constants.DESIRED_RESOLUTION[0] / 4,
                                 15,
