@@ -108,6 +108,9 @@ class SpaceShip(pygame.sprite.Sprite):
             if 0 > missile.position[0] or missile.position[0] > DESIRED_RESOLUTION[0]:
                 self.missiles.remove(missile)
 
+    def missile_has_collided(self, missile):
+        self.missiles.remove(missile)
+
     def blit(self, screen):
         screen.blit(self.sprite, self.position)
         for missile in self.missiles:
@@ -200,11 +203,17 @@ class SpaceBagels:
     def detect_collisions(self):
         player_left_objects = self.player_left.get_objects()
         player_right_objects = self.player_right.get_objects()
-        if pygame.sprite.spritecollideany(self.player_left, player_right_objects):
+
+        hit_left_player = pygame.sprite.spritecollideany(self.player_left, player_right_objects)
+        if hit_left_player:
             print("Player Left hit")
+            self.player_right.missile_has_collided(hit_left_player)
             self.player_left.damage_ship(health_percentage_div=10)
+
+        hit_right_player = pygame.sprite.spritecollideany(self.player_right, player_left_objects)
         if pygame.sprite.spritecollideany(self.player_right, player_left_objects):
             print("Player Right hit")
+            self.player_left.missile_has_collided(hit_right_player)
             self.player_right.damage_ship(health_percentage_div=10)
 
 
