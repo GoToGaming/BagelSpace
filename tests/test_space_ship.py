@@ -54,8 +54,10 @@ def test_left_space_ship_should_not_move_left(test_sprite):
     space_ship.tick()
     assert all(space_ship.position == [0,0])
 
+
 def test_right_space_ship_should_not_move_left(test_sprite):
     space_ship = BagelSpace.SpaceShip((BagelSpace.SpaceShip.MIDDLE_POS,0), BagelSpace.SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite)
+
 
 def test_right_space_ship_should_not_move_left():
     space_ship = BagelSpace.SpaceShip((BagelSpace.SpaceShip.MIDDLE_POS,0), BagelSpace.SpaceShip.SPACE_SHIP_IS_RIGHT)
@@ -64,9 +66,11 @@ def test_right_space_ship_should_not_move_left():
     space_ship.tick()
     assert all(space_ship.position == [BagelSpace.SpaceShip.MIDDLE_POS,0])
 
+
 def test_left_space_ship_should_not_move_right(test_sprite):
     pos = (BagelSpace.SpaceShip.MIDDLE_POS - test_sprite.get_size()[0], 0)
     space_ship = BagelSpace.SpaceShip(pos, BagelSpace.SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite)
+
 
 def test_left_space_ship_should_not_move_right():
     pos = (BagelSpace.SpaceShip.MIDDLE_POS - BagelSpace.SpaceShip.SPRITE_LEFT.get_size()[0], 0)
@@ -76,9 +80,11 @@ def test_left_space_ship_should_not_move_right():
     space_ship.tick()
     assert all(space_ship.position == pos)
 
+
 def test_right_space_ship_should_not_move_right(test_sprite):
     pos = (BagelSpace.DESIRED_RESOLUTION[0] - test_sprite.get_size()[0], 0)
     space_ship = BagelSpace.SpaceShip(pos, BagelSpace.SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite)
+
 
 def test_right_space_ship_should_not_move_right():
     pos = (BagelSpace.DESIRED_RESOLUTION[0] - BagelSpace.SpaceShip.SPRITE_RIGHT.get_size()[0], 0)
@@ -88,10 +94,12 @@ def test_right_space_ship_should_not_move_right():
     space_ship.tick()
     assert all(space_ship.position == pos)
 
+
 def test_left_space_ship_should_move_left(test_sprite):
     space_ship = BagelSpace.SpaceShip((BagelSpace.SpaceShip.DEFAULT_VELOCITY,0),
                                       BagelSpace.SpaceShip.SPACE_SHIP_IS_LEFT,
                                       test_sprite)
+
 
 def test_left_space_ship_should_move_left():
     space_ship = BagelSpace.SpaceShip((BagelSpace.SpaceShip.DEFAULT_VELOCITY,0), BagelSpace.SpaceShip.SPACE_SHIP_IS_LEFT)

@@ -49,6 +49,7 @@ class SpaceShip(pygame.sprite.Sprite):
         super().__init__()
         self.position = np.array(position)
         self.space_ship_side = space_ship_side
+        self.sprite = sprite
         self.health_percentage = 100
         self.ship_destroyed = False
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
