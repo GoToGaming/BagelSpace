@@ -343,7 +343,10 @@ class SpaceBagels:
 class GameMenu:
     def __init__(self, screen, clock):
         self._screen = screen
-        self.use_joystick = False
+        if pygame.joystick.get_count() < 2:
+            self.use_joystick = False
+        else:
+            self.use_joystick = True
         self.game = SpaceBagels(self._screen, clock)
         self.game._set_input_method(self.use_joystick)
 
