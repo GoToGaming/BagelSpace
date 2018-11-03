@@ -373,14 +373,23 @@ class GameMenu:
                                         window_width=DESIRED_RESOLUTION[0],
                                         window_height=DESIRED_RESOLUTION[1])
 
+        def _select_input_method(method):
+            if method == 'Keyboard':
+                self.use_joystick = False
+            elif method == 'Joystick':
+                self.use_joystick = True
+            else:
+                raise ValueError
+            self.game._set_input_method(self.use_joystick)
+
         if pygame.joystick.get_count() < 2:
-            options = ['Keyboard']
+            options = [('Keyboard', 'Keyboard')]
         else:
-            options = ['Keyboard', 'Joystick']
+            options = [('Keyboard', 'Keyboard'), ('Joystick', 'Joystick')]
         settings_menu.add_selector('Input',
                                    options,
                                    onreturn=None,
-                                   onchange=self._select_input_method)
+                                   onchange=_select_input_method)
 
         self.menu.add_option('New Game', _new_game_callback)
         self.menu.add_option('Settings', settings_menu)
@@ -394,13 +403,6 @@ class GameMenu:
                 sys.exit()
         self.menu.mainloop(events)
 
-    def _select_input_method(self, method):
-        if method == 'Keyboard':
-            self.use_joystick = False
-        elif method == 'Joystick':
-            self.use_joystick = True
-        else:
-            raise ValueError
 
 
 def main():
