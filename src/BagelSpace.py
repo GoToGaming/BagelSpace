@@ -3,10 +3,10 @@ import sys
 from enum import Enum
 
 import numpy as np
+import random as rand
 import pygame
 import pygameMenu
 from pygameMenu.locals import *
-
 
 DESIRED_RESOLUTION = (1280, 720)
 TARGET_FPS = 60
@@ -47,12 +47,12 @@ KEYBOARD_MAPPING = {pygame.K_UP: Button.UP,
                     pygame.K_SPACE: Button.FIRE,
                     pygame.K_RETURN: Button.FIRE}
 
-black = (0, 0, 0)
-white = (255, 255, 255)
-red = (255, 0, 0)
-green = (0, 255, 0)
-blue = (0, 0, 255)
-yellow = (255, 255, 0)
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+YELLOW = (255, 255, 0)
 
 
 def load_image(path, scale=1, animation=False, flip_x=False, flip_y=False, alpha=True, fixed_hight_pixels=None):
@@ -76,7 +76,7 @@ def load_image(path, scale=1, animation=False, flip_x=False, flip_y=False, alpha
         counter = 1
         while animation:
             try:
-                image = pygame.image.load(path + str(counter) + ".png")
+                image = pygame.image.load("{}{}.png".format(path, str(counter)))
                 image = pygame.transform.scale(image, [x * scale for x in image.get_size()])
                 image = pygame.transform.flip(image, flip_x, flip_y)
                 if alpha:
@@ -94,11 +94,11 @@ def load_image(path, scale=1, animation=False, flip_x=False, flip_y=False, alpha
 
 class Animation:
 
-    def __init__(self, path, speed, scale=1, flip_x=False, flip_y=False, alpha = True):
+    def __init__(self, sprites, speed):
         self.speed = speed
         self.counter = 0
         self.current_image = 0
-        self.animation = load_image(path, scale=scale, animation=True, flip_x=flip_x, flip_y=flip_y, alpha=alpha)
+        self.animation = sprites
 
     def update(self):
         self.counter += 1
@@ -120,7 +120,7 @@ class Missile(pygame.sprite.Sprite):
         self.position = np.array(pos)
         self.velocity = np.array(velocity)
 
-        self.animation = Animation(self.MISSILE_FILE_NAME, 4, GAME_SCALE, flip_x=is_right_player)
+        self.animation = Animation(load_image(self.MISSILE_FILE_NAME, GAME_SCALE, animation=True, flip_x=is_right_player), 4)
 
     def tick(self):
         self.position += self.velocity
@@ -136,9 +136,59 @@ class Missile(pygame.sprite.Sprite):
         return rect
 
 
+class MeteoriteController:
+    METEORITE_TARGET_COUNT = 15
+    meteorites = []
+
+    def tick(self):
+        if len(self.meteorites) < self.METEORITE_TARGET_COUNT:
+            self.spawn_meteorite()
+
+        for meteorite in self.meteorites:
+            meteorite.tick()
+            if 0 > meteorite.position[0] or meteorite.position[0] > DESIRED_RESOLUTION[0]:
+                self.meteorites.remove(meteorite)
+
+    def spawn_meteorite(self):
+        x = DESIRED_RESOLUTION[0] / 2
+        y = rand.randint(0, DESIRED_RESOLUTION[1])
+        direction = rand.choice([-1,1])
+        speed = (rand.random()*2)+1
+        meteorite = Meteorite((x, y), (speed*direction, 0))
+        self.meteorites.append(meteorite)
+
+    def blit(self, screen):
+        for meteorite in self.meteorites:
+            meteorite.blit(screen)
+
+
+class Meteorite(pygame.sprite.Sprite):
+    METEORITE_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'meteorite.png')
+
+    def __init__(self, pos, velocity):
+        super().__init__()
+        self.position = np.array(pos)
+        self.velocity = np.array(velocity)
+        self.health = 100.
+
+        self.sprite = load_image(self.METEORITE_FILE_NAME)
+
+    def tick(self):
+        self.position += self.velocity
+
+    def blit(self, screen):
+        screen.blit(self.sprite, self.position)
+
+    @property
+    def rect(self):
+        rect = self.sprite.get_rect()
+        rect.x, rect.y = self.position
+        return rect
+
+
 class SpaceShip(pygame.sprite.Sprite):
-    SPACE_SHIP_IS_LEFT = 1
-    SPACE_SHIP_IS_RIGHT = 2
+    SPACE_SHIP_IS_LEFT = 'RED'
+    SPACE_SHIP_IS_RIGHT = 'BLUE'
     SPRITE_LEFT_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'red_ship_1.png')
     SPRITE_RIGHT_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'blue_ship.png')
     DEFAULT_VELOCITY = SPACE_SHIP_VELOCITY
@@ -151,28 +201,29 @@ class SpaceShip(pygame.sprite.Sprite):
         self.sprite = sprite
         self.health_percentage = 100
         self.ship_destroyed = False
-        self.reaming_reload_ticks = 0
+        self.rearming_reload_ticks = 0
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
-            self.space_ship_bound = np.array([[0,0],
-                                      np.array([DESIRED_RESOLUTION[0] / 2, DESIRED_RESOLUTION[1]]) - self.sprite.get_size()])
+            self.space_ship_bound = np.array([[0, 0],
+                                              np.array([DESIRED_RESOLUTION[0] / 2,
+                                                        DESIRED_RESOLUTION[1]]) - self.sprite.get_size()])
         else:
-            self.space_ship_bound = np.array([[DESIRED_RESOLUTION[0] / 2,0],
-                                       np.array(DESIRED_RESOLUTION) - self.sprite.get_size()])
+            self.space_ship_bound = np.array([[DESIRED_RESOLUTION[0] / 2, 0],
+                                              np.array(DESIRED_RESOLUTION) - self.sprite.get_size()])
         if any(self.space_ship_bound[0] > self.position) or any(self.position > self.space_ship_bound[1]):
             raise ValueError
         self.velocity = np.array([0, 0])
         self.firing = False
         self.missiles = []
 
-    def damage_ship(self, health_percentage_div):
-        self.health_percentage -= int(health_percentage_div)
+    def damage_ship(self, health_percentage_diff):
+        self.health_percentage -= health_percentage_diff
         if self.health_percentage <= 0:
             self.health_percentage = 0
             self.ship_destroyed = True
         return self.ship_destroyed
 
-    def increase_health_percentage(self, health_percentage_div):
-        new_health_percentage = self.health_percentage + int(health_percentage_div)
+    def increase_health_percentage(self, health_percentage_diff):
+        new_health_percentage = self.health_percentage + int(health_percentage_diff)
         if new_health_percentage > 100:
             self.health_percentage = 100
         else:
@@ -215,10 +266,12 @@ class SpaceShip(pygame.sprite.Sprite):
     def tick(self):
         new_position = self.position + self.velocity
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
-            self.position = np.clip(new_position, [0,0], np.array([self.MIDDLE_POS,DESIRED_RESOLUTION[1]])-self.sprite.get_size())
+            self.position = np.clip(new_position, [0, 0],
+                                    np.array([self.MIDDLE_POS, DESIRED_RESOLUTION[1]]) - self.sprite.get_size())
             missile_velocity = (3, 0)
         else:
-            self.position = np.clip(new_position, [self.MIDDLE_POS,0], np.array(DESIRED_RESOLUTION)-self.sprite.get_size())
+            self.position = np.clip(new_position, [self.MIDDLE_POS, 0],
+                                    np.array(DESIRED_RESOLUTION) - self.sprite.get_size())
             missile_velocity = (-3, 0)
 
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
@@ -226,11 +279,11 @@ class SpaceShip(pygame.sprite.Sprite):
         else:
             is_right_player = True
 
-        if self.reaming_reload_ticks > 0:
-            self.reaming_reload_ticks -= 1
-        if self.firing and self.reaming_reload_ticks <= 0:
+        if self.rearming_reload_ticks > 0:
+            self.rearming_reload_ticks -= 1
+        if self.firing and self.rearming_reload_ticks <= 0:
             self.missiles.append(Missile(self.calculate_missile_start_pos(), missile_velocity, is_right_player))
-            self.reaming_reload_ticks = int(Missile.reload_time_sec * 60)
+            self.rearming_reload_ticks = int(Missile.reload_time_sec * 60)
         for missile in self.missiles.copy():
             missile.tick()
             if 0 > missile.position[0] or missile.position[0] > DESIRED_RESOLUTION[0]:
@@ -264,7 +317,9 @@ class SpaceBagels:
         self.player_left = SpaceShip((200, 360), SpaceShip.SPACE_SHIP_IS_LEFT, player_left_sprite)
         player_right_sprite = load_image(SpaceShip.SPRITE_RIGHT_FILE_NAME,  fixed_hight_pixels=SPACE_SHIP_HIGHT)
         self.player_right = SpaceShip((1000, 360), SpaceShip.SPACE_SHIP_IS_RIGHT, player_right_sprite)
+        self.meteorite_controller = MeteoriteController()
         self.running = True
+        self.game_ended = ''
         self.last_frametime = 0
         self.use_joystick = False
 
@@ -279,9 +334,11 @@ class SpaceBagels:
                     exit()
                 elif e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
                     self.running = False
-                    return
                 else:
                     self.process_input(e)
+
+            if not self.running:
+                return
 
             self.last_frametime += self._clock.tick()
             tick_count = int(self.last_frametime // TARGET_FRAMETIME_MS)
@@ -296,12 +353,20 @@ class SpaceBagels:
 
         if self.use_joystick:
             if event.type in (pygame.JOYHATMOTION, pygame.JOYBUTTONUP, pygame.JOYBUTTONDOWN):
+                if event.type == pygame.JOYBUTTONDOWN and self.game_ended:
+                    self.running = False
+                    return
+
                 if event.dict['joy'] == 0:
                     self.player_left.process_input(event, None)
                 elif event.dict['joy'] == 1:
                     self.player_right.process_input(event, None)
         else:
             if event.type in (pygame.KEYUP, pygame.KEYDOWN):
+                if event.type == pygame.KEYDOWN and self.game_ended:
+                    self.running = False
+                    return
+
                 if event.key in (pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d, pygame.K_SPACE):
                     self.player_left.process_input(event, KEYBOARD_MAPPING[event.key])
                 elif event.key in (pygame.K_UP, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT, pygame.K_RETURN):
@@ -314,48 +379,76 @@ class SpaceBagels:
         for tick in range(tick_count):
             self.player_left.tick()
             self.player_right.tick()
-            self.detect_collisions()
+            self.meteorite_controller.tick()
+            if not self.game_ended:
+                self._detect_collisions()
         self.blit()
 
-    def draw_text(self, string, size, x_middle, y_middle, color=yellow):
+    def draw_text_centered(self, string, size, x_middle, y_middle, color=YELLOW):
         font = pygame.font.Font('freesansbold.ttf', size)
         text_surface = font.render(string, True, color)
         text_rect = text_surface.get_rect()
         text_rect.center = (x_middle, y_middle)
         self._screen.blit(text_surface, text_rect)
 
-    def draw_text2(self, string, size, x, y, color=yellow):
+    def draw_text_left_edge(self, string, size, x, y, color=YELLOW):
         font = pygame.font.Font('freesansbold.ttf', size)
         text_surface = font.render(string, True, color)
         self._screen.blit(text_surface, (x, y))
 
-    def blit_status_bar(self):
-        self.draw_text2(f'{self.player_left.health_percentage}%', size=30, x=0, y=0, color=red)
-
-        self.draw_text2(f'{self.player_right.health_percentage}%', size=30, x=1000, y=0, color=blue)
-
     def blit(self):
         self._screen.blit(SPRITES[self.BACKGROUND_FILE_NAME], (0, 0))
-        self.player_left.blit(self._screen)
-        self.player_right.blit(self._screen)
-        self.blit_status_bar()
+        self.meteorite_controller.blit(self._screen)
 
+        if self.game_ended:
+            self._blit_game_ended_screen()
+        else:
+            self.player_left.blit(self._screen)
+            self.player_right.blit(self._screen)
+            self._blit_status_bar()
 
-    def detect_collisions(self):
+    def _blit_game_ended_screen(self):
+        res = np.array(DESIRED_RESOLUTION)
+        rect = pygame.Rect(res/4, res/2)
+        self._screen.fill((0, 0, 0), rect)
+        winner = self.game_ended
+        font_size = 80
+        self.draw_text_centered('Game over!', font_size, DESIRED_RESOLUTION[0] / 2, DESIRED_RESOLUTION[1] / 2 - font_size, color=WHITE)
+        self.draw_text_centered('Winner is {}'.format(winner), font_size, DESIRED_RESOLUTION[0] / 2, DESIRED_RESOLUTION[1] / 2, color=WHITE)
+        font_size = 40
+        self.draw_text_centered('Press any key to return to menu.'.format(winner), font_size, DESIRED_RESOLUTION[0] / 2, DESIRED_RESOLUTION[1] / 2 + 3*font_size, color=WHITE)
+
+    def _blit_status_bar(self):
+        self.draw_text_centered(f'{int(np.ceil(self.player_left.health_percentage))}%', 30, DESIRED_RESOLUTION[0]/4, 15, color=RED)
+        self.draw_text_centered(f'{int(np.ceil(self.player_right.health_percentage))}%', 30, 3*DESIRED_RESOLUTION[0]/4, 15, color=BLUE)
+
+    def _detect_collisions(self):
         player_left_objects = self.player_left.get_objects()
         player_right_objects = self.player_right.get_objects()
 
+        # Missiles
         hit_left_player = pygame.sprite.spritecollideany(self.player_left, player_right_objects)
         if hit_left_player:
-            print("Player Left hit")
             self.player_right.missile_has_collided(hit_left_player)
-            self.player_left.damage_ship(health_percentage_div=10)
+            if self.player_left.damage_ship(health_percentage_diff=10):
+                self.game_ended = SpaceShip.SPACE_SHIP_IS_RIGHT
 
         hit_right_player = pygame.sprite.spritecollideany(self.player_right, player_left_objects)
         if pygame.sprite.spritecollideany(self.player_right, player_left_objects):
-            print("Player Right hit")
             self.player_left.missile_has_collided(hit_right_player)
-            self.player_right.damage_ship(health_percentage_div=10)
+            if self.player_right.damage_ship(health_percentage_diff=10):
+                self.game_ended = SpaceShip.SPACE_SHIP_IS_LEFT
+
+        # Meteorites
+        meteorites = self.meteorite_controller.meteorites
+
+        hit_left_player = pygame.sprite.spritecollideany(self.player_left, meteorites)
+        if hit_left_player:
+            self.player_left.damage_ship(health_percentage_diff=0.1)
+
+        hit_right_player = pygame.sprite.spritecollideany(self.player_right, meteorites)
+        if hit_right_player:
+            self.player_right.damage_ship(health_percentage_diff=0.1)
 
     def _set_input_method(self, use_joystick):
         self.use_joystick = use_joystick
