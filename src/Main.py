@@ -194,10 +194,14 @@ class Main:
         collision_dict_right = pygame.sprite.groupcollide(meteorites, missiles_right, False, True)
 
         for meteorite, missiles in collision_dict_left.items():
-            if meteorite.damage_meteorite(50):
-                self.meteorite_controller.meteorites.remove(meteorite)
+            for missile in missiles:
+                meteorite.damage_meteorite(50)
         for meteorite, missiles in collision_dict_right.items():
-            if meteorite.damage_meteorite(50):
+            for missile in missiles:
+                meteorite.damage_meteorite(50)
+
+        for meteorite in self.meteorite_controller.meteorites.copy():
+            if meteorite.health == 0:
                 self.meteorite_controller.meteorites.remove(meteorite)
 
         self.player_left.missiles = [missile for missile in missiles_left]
