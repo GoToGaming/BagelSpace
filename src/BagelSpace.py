@@ -1,6 +1,6 @@
-import datetime
 import os
 import sys
+from enum import Enum
 
 import numpy as np
 import pygame
@@ -13,6 +13,26 @@ GAME_SCALE = 2
 TARGET_FPS = 60
 TARGET_FRAMETIME_MS = 1000. / TARGET_FPS
 SPRITES = {}
+
+
+class Button(Enum):
+    UP = 0,
+    DOWN = 1,
+    LEFT = 2,
+    RIGHT = 3,
+    FIRE = 4
+
+
+KEYBOARD_MAPPING = {pygame.K_UP: Button.UP,
+                    pygame.K_w: Button.UP,
+                    pygame.K_DOWN: Button.DOWN,
+                    pygame.K_s: Button.DOWN,
+                    pygame.K_LEFT: Button.LEFT,
+                    pygame.K_a: Button.LEFT,
+                    pygame.K_RIGHT: Button.RIGHT,
+                    pygame.K_d: Button.RIGHT,
+                    pygame.K_SPACE: Button.FIRE,
+                    pygame.K_RETURN: Button.FIRE}
 
 black = (0, 0, 0)
 white = (255, 255, 255)
@@ -139,7 +159,7 @@ class SpaceShip(pygame.sprite.Sprite):
         else:
             self.health_percentage = new_health_percentage
 
-    def process_input(self, event):
+    def process_input(self, event, button):
         if event.type == pygame.JOYHATMOTION:
             if event.dict['hat'] == 0:
                 self.velocity = self.DEFAULT_VELOCITY * np.array(event.dict['value'])
@@ -148,6 +168,24 @@ class SpaceShip(pygame.sprite.Sprite):
             self.firing = False
         elif event.type == pygame.JOYBUTTONDOWN:
             self.firing = True
+        elif event.type == pygame.KEYDOWN:
+            if button == button.UP:
+                self.velocity[1] = -self.DEFAULT_VELOCITY
+            elif button == Button.DOWN:
+                self.velocity[1] = self.DEFAULT_VELOCITY
+            if button == Button.LEFT:
+                self.velocity[0] = -self.DEFAULT_VELOCITY
+            elif button == Button.RIGHT:
+                self.velocity[0] = self.DEFAULT_VELOCITY
+            if button == Button.FIRE:
+                self.firing = True
+        elif event.type == pygame.KEYUP:
+            if button in (Button.UP, Button.DOWN):
+                self.velocity[1] = 0
+            if button in (Button.LEFT, Button.RIGHT):
+                self.velocity[0] = 0
+            if button == Button.FIRE:
+                self.firing = False
 
     def calculate_missile_start_pos(self):
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
@@ -207,6 +245,7 @@ class SpaceBagels:
         self.player_right = SpaceShip((1000, 360), SpaceShip.SPACE_SHIP_IS_RIGHT, SpaceShip.SPRITE_RIGHT_FILE_NAME)
         self.running = True
         self.last_frametime = 0
+        self.use_joystick = False
 
     def main(self):
         self.running = True
@@ -234,13 +273,18 @@ class SpaceBagels:
         if not self.running:
             return
 
-        if event.type in (pygame.KEYUP, pygame.KEYDOWN):
-            print('key input not implemented')
-        elif event.type in (pygame.JOYHATMOTION, pygame.JOYBUTTONUP, pygame.JOYBUTTONDOWN):
-            if event.dict['joy'] == 0:
-                self.player_left.process_input(event)
-            elif event.dict['joy'] == 1:
-                self.player_right.process_input(event)
+        if self.use_joystick:
+            if event.type in (pygame.JOYHATMOTION, pygame.JOYBUTTONUP, pygame.JOYBUTTONDOWN):
+                if event.dict['joy'] == 0:
+                    self.player_left.process_input(event, None)
+                elif event.dict['joy'] == 1:
+                    self.player_right.process_input(event, None)
+        else:
+            if event.type in (pygame.KEYUP, pygame.KEYDOWN):
+                if event.key in (pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d, pygame.K_SPACE):
+                    self.player_left.process_input(event, KEYBOARD_MAPPING[event.key])
+                elif event.key in (pygame.K_UP, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT, pygame.K_RETURN):
+                    self.player_right.process_input(event, KEYBOARD_MAPPING[event.key])
 
     def tick(self, tick_count):
         if not self.running:
@@ -285,11 +329,16 @@ class SpaceBagels:
             self.player_left.missile_has_collided(hit_right_player)
             self.player_right.damage_ship(health_percentage_div=10)
 
+    def _set_input_method(self, use_joystick):
+        self.use_joystick = use_joystick
+
 
 class GameMenu:
     def __init__(self, screen, clock):
         self._screen = screen
+        self.use_joystick = False
         self.game = SpaceBagels(self._screen, clock)
+        self.game._set_input_method(self.use_joystick)
 
         def _main_menu_callback():
             self._screen.fill((40, 0, 40))
@@ -297,10 +346,12 @@ class GameMenu:
         def _resume_callback():
             self.menu.disable()
             self.game.main()
+            self.game._set_input_method(self.use_joystick)
 
         def _new_game_callback():
             self.menu.disable()
             self.game = SpaceBagels(self._screen, clock)
+            self.game._set_input_method(self.use_joystick)
             self.game.main()
 
         self.menu = pygameMenu.Menu(self._screen,
@@ -313,7 +364,26 @@ class GameMenu:
                                     window_width=DESIRED_RESOLUTION[0],
                                     window_height=DESIRED_RESOLUTION[1])
 
+        settings_menu = pygameMenu.Menu(self._screen,
+                                        bgfun=_main_menu_callback,
+                                        font=pygameMenu.fonts.FONT_8BIT,
+                                        menu_alpha=90,
+                                        onclose=PYGAME_MENU_BACK,
+                                        title='Settings',
+                                        window_width=DESIRED_RESOLUTION[0],
+                                        window_height=DESIRED_RESOLUTION[1])
+
+        if pygame.joystick.get_count() < 2:
+            options = ['Keyboard']
+        else:
+            options = ['Keyboard', 'Joystick']
+        settings_menu.add_selector('Input',
+                                   options,
+                                   onreturn=None,
+                                   onchange=self._select_input_method)
+
         self.menu.add_option('New Game', _new_game_callback)
+        self.menu.add_option('Settings', settings_menu)
         self.menu.add_option('Exit', PYGAME_MENU_EXIT)
 
     def process_inputs(self, events):
@@ -324,8 +394,13 @@ class GameMenu:
                 sys.exit()
         self.menu.mainloop(events)
 
-    def select_input_method(self):
-        pass
+    def _select_input_method(self, method):
+        if method == 'Keyboard':
+            self.use_joystick = False
+        elif method == 'Joystick':
+            self.use_joystick = True
+        else:
+            raise ValueError
 
 
 def main():
@@ -342,7 +417,6 @@ def main():
     joysticks = [pygame.joystick.Joystick(idx) for idx in range(pygame.joystick.get_count())]
     for joystick in joysticks:
         joystick.init()
-
     menu = GameMenu(screen, clock)
 
     while True:
