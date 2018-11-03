@@ -76,12 +76,12 @@ class Missile(pygame.sprite.Sprite):
     MISSILE_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'rocket')
     reload_time_sec = 0.5
 
-    def __init__(self, pos, velocity):
+    def __init__(self, pos, velocity, is_right_player):
         super().__init__()
         self.position = np.array(pos)
         self.velocity = np.array(velocity)
 
-        self.animation = Animation(self.MISSILE_FILE_NAME, 4, GAME_SCALE)
+        self.animation = Animation(self.MISSILE_FILE_NAME, 4, GAME_SCALE, flip_x=is_right_player)
 
     def tick(self):
         self.position += self.velocity
@@ -150,7 +150,10 @@ class SpaceShip(pygame.sprite.Sprite):
             self.firing = True
 
     def calculate_missile_start_pos(self):
-        return self.position + np.array([0, int(self.sprite.get_size()[1] / 2)])
+        if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
+            return self.position + np.array([self.sprite.get_size()[0], int(self.sprite.get_size()[1] / 2)])
+        else:
+            return self.position + np.array([0, int(self.sprite.get_size()[1] / 2)])
 
     def tick(self):
         new_position = self.position + self.velocity
@@ -161,10 +164,15 @@ class SpaceShip(pygame.sprite.Sprite):
             self.position = np.clip(new_position, [self.MIDDLE_POS,0], np.array(DESIRED_RESOLUTION)-self.sprite.get_size())
             missile_velocity = (-3, 0)
 
+        if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
+            is_right_player = False
+        else:
+            is_right_player = True
+
         if self.reaming_reload_ticks > 0:
             self.reaming_reload_ticks -= 1
         if self.firing and self.reaming_reload_ticks <= 0:
-            self.missiles.append(Missile(self.calculate_missile_start_pos(), missile_velocity))
+            self.missiles.append(Missile(self.calculate_missile_start_pos(), missile_velocity, is_right_player))
             self.reaming_reload_ticks = int(Missile.reload_time_sec * 60)
         for missile in self.missiles.copy():
             missile.tick()
