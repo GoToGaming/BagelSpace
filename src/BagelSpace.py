@@ -365,9 +365,9 @@ class SpaceBagels:
         self._screen.blit(text_surface, (x, y))
 
     def blit_status_bar(self):
-        self.draw_text2(f'{self.player_left.health_percentage}%', size=30, x=0, y=0, color=red)
+        self.draw_text2(f'{int(self.player_left.health_percentage)}%', size=30, x=0, y=0, color=red)
 
-        self.draw_text2(f'{self.player_right.health_percentage}%', size=30, x=1000, y=0, color=blue)
+        self.draw_text2(f'{int(self.player_right.health_percentage)}%', size=30, x=1000, y=0, color=blue)
 
     def blit(self):
         self._screen.blit(SPRITES[self.BACKGROUND_FILE_NAME], (0, 0))
