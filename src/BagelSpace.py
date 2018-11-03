@@ -206,7 +206,7 @@ def main():
     screen = pygame.display.set_mode(DESIRED_RESOLUTION)
     pygame.display.set_caption('SpaceBagels')
 
-    SPRITES[SpaceBagels.BACKGROUND_FILE_NAME] = pygame.image.load(SpaceBagels.BACKGROUND_FILE_NAME).convert()
+    SPRITES[SpaceBagels.BACKGROUND_FILE_NAME] = pygame.transform.scale(pygame.image.load(SpaceBagels.BACKGROUND_FILE_NAME), DESIRED_RESOLUTION).convert()
     SPRITES[SpaceShip.SPRITE_LEFT_FILE_NAME] = pygame.image.load(SpaceShip.SPRITE_LEFT_FILE_NAME).convert_alpha()
     SPRITES[SpaceShip.SPRITE_RIGHT_FILE_NAME] = pygame.image.load(SpaceShip.SPRITE_RIGHT_FILE_NAME).convert_alpha()
     SPRITES[Missile.MISSILE_FILE_NAME] = pygame.image.load(Missile.MISSILE_FILE_NAME).convert_alpha()
