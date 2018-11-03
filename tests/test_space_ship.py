@@ -127,10 +127,10 @@ def test_health_percentage_till_death(test_sprite):
         test_sprite)
     assert space_ship.health_percentage == 100
 
-    assert space_ship.damage_ship(health_percentage_div=50) is False
+    assert space_ship.damage_ship(health_percentage_diff=50) is False
     assert space_ship.health_percentage == 50
 
-    assert space_ship.damage_ship(health_percentage_div=80) is True
+    assert space_ship.damage_ship(health_percentage_diff=80) is True
     assert space_ship.health_percentage == 0
 
 
