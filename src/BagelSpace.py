@@ -135,7 +135,7 @@ class MeteoriteController:
         y = rand.randint(0, DESIRED_RESOLUTION[1])
         direction = rand.choice([-1,1])
         speed = (rand.random()*2)+1
-        meteorite = Meteorite((x, y), (speed*direction, 0));
+        meteorite = Meteorite((x, y), (speed*direction, 0))
         self.meteorites.append(meteorite)
 
     def blit(self, screen):
@@ -150,6 +150,7 @@ class Meteorite(pygame.sprite.Sprite):
         super().__init__()
         self.position = np.array(pos)
         self.velocity = np.array(velocity)
+        self.health = 100.
 
         self.sprite = load_image(self.METEORITE_FILE_NAME)
 
@@ -377,14 +378,13 @@ class SpaceBagels:
 
     def blit(self):
         self._screen.blit(SPRITES[self.BACKGROUND_FILE_NAME], (0, 0))
-        self.player_left.blit(self._screen)
-        self.player_right.blit(self._screen)
-        self._blit_status_bar()
         self.meteorite_controller.blit(self._screen)
 
         if self.game_ended:
             self._blit_game_ended_screen()
         else:
+            self.player_left.blit(self._screen)
+            self.player_right.blit(self._screen)
             self._blit_status_bar()
 
     def _blit_game_ended_screen(self):
@@ -411,13 +411,13 @@ class SpaceBagels:
         if hit_left_player:
             self.player_right.missile_has_collided(hit_left_player)
             if self.player_left.damage_ship(health_percentage_diff=10):
-                self.game_ended = SpaceShip.SPACE_SHIP_IS_LEFT
+                self.game_ended = SpaceShip.SPACE_SHIP_IS_RIGHT
 
         hit_right_player = pygame.sprite.spritecollideany(self.player_right, player_left_objects)
         if pygame.sprite.spritecollideany(self.player_right, player_left_objects):
             self.player_left.missile_has_collided(hit_right_player)
             if self.player_right.damage_ship(health_percentage_diff=10):
-                self.game_ended = SpaceShip.SPACE_SHIP_IS_RIGHT
+                self.game_ended = SpaceShip.SPACE_SHIP_IS_LEFT
 
         # Meteorites
         meteorites = self.meteorite_controller.meteorites
