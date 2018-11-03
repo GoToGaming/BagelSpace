@@ -213,6 +213,8 @@ def main():
 
     menu = GameMenu(screen)
 
+    menu.select_input_method()
+
     while True:
         for event in pygame.event.get():
             menu.process_input(event)
