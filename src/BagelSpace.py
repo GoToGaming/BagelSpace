@@ -399,8 +399,8 @@ class SpaceBagels:
         self.draw_text_centered('Press any key to return to menu.'.format(winner), font_size, DESIRED_RESOLUTION[0] / 2, DESIRED_RESOLUTION[1] / 2 + 3*font_size, color=WHITE)
 
     def _blit_status_bar(self):
-        self.draw_text_centered(f'{self.player_left.health_percentage}%', 30, DESIRED_RESOLUTION[0]/4, 15, color=RED)
-        self.draw_text_centered(f'{self.player_right.health_percentage}%', 30, 3*DESIRED_RESOLUTION[0]/4, 15, color=BLUE)
+        self.draw_text_centered(f'{int(np.ceil(self.player_left.health_percentage))}%', 30, DESIRED_RESOLUTION[0]/4, 15, color=RED)
+        self.draw_text_centered(f'{int(np.ceil(self.player_right.health_percentage))}%', 30, 3*DESIRED_RESOLUTION[0]/4, 15, color=BLUE)
 
     def _detect_collisions(self):
         player_left_objects = self.player_left.get_objects()
