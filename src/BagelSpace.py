@@ -8,6 +8,13 @@ import pygame
 DESIRED_RESOLUTION = (1280, 720)
 SPRITES = {}
 
+black = (0, 0, 0)
+white = (255, 255, 255)
+red = (255, 0, 0)
+green = (0, 255, 0)
+blue = (0, 0, 255)
+yellow = (255, 255, 0)
+
 
 class Missile(pygame.sprite.Sprite):
     MISSILE_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'machine_gun_bullet1.png')
@@ -131,6 +138,18 @@ class SpaceBagels:
             self.detect_collisions()
         self.blit()
 
+    def _draw_text(self, string, size, x_middle, y_middle, color=yellow):
+        font = pygame.font.Font('freesansbold.ttf', size)
+        text_surface = font.render(string, True, color)
+        text_rect = text_surface.get_rect()
+        text_rect.center = (x_middle, y_middle)
+        self._screen.blit(text_surface, text_rect)
+
+    def _draw_text2(self, string, size, x, y, color=yellow):
+        font = pygame.font.Font('freesansbold.ttf', size)
+        text_surface = font.render(string, True, color)
+        self._screen.blit(text_surface, (x, y))
+
     def blit(self):
         self._screen.blit(SPRITES[self.BACKGROUND_FILE_NAME], (0, 0))
         self.player_left.blit(self._screen)
@@ -141,8 +160,10 @@ class SpaceBagels:
         player_right_objects = self.player_right.get_objects()
         if pygame.sprite.spritecollideany(self.player_left, player_right_objects):
             print("Player Left hit")
+            self.player_left.damage_ship(health_percentage_div=10)
         if pygame.sprite.spritecollideany(self.player_right, player_left_objects):
             print("Player Right hit")
+            self.player_right.damage_ship(health_percentage_div=10)
 
 
 class GameMenu:
