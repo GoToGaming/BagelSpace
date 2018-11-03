@@ -36,7 +36,7 @@ class GameMenu:
                                     font=pygameMenu.fonts.FONT_8BIT,
                                     menu_alpha=90,
                                     onclose=_resume_callback,
-                                    title='BagelSpace',
+                                    title='SpaceBagels',
                                     window_width=Constants.DESIRED_RESOLUTION[0],
                                     window_height=Constants.DESIRED_RESOLUTION[1])
 
