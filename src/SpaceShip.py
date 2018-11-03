@@ -88,11 +88,11 @@ class SpaceShip(pygame.sprite.Sprite):
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
             self.position = np.clip(new_position, [0, 0],
                                     np.array([self.MIDDLE_POS, Constants.DESIRED_RESOLUTION[1]]) - self.sprite.get_size())
-            missile_velocity = (3, 0)
+            missile_velocity = (Constants.MISSILE_VELOCITY, 0)
         else:
             self.position = np.clip(new_position, [self.MIDDLE_POS, 0],
                                     np.array(Constants.DESIRED_RESOLUTION) - self.sprite.get_size())
-            missile_velocity = (-3, 0)
+            missile_velocity = (-Constants.MISSILE_VELOCITY, 0)
 
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
             is_right_player = False

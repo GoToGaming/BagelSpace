@@ -7,7 +7,7 @@ from src import Animation, Constants, Tools
 
 class Missile(pygame.sprite.Sprite):
     MISSILE_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'rocket')
-    RELOAD_TIME_SEC = 0.5
+    RELOAD_TIME_SEC = Constants.MISSILE_RELOAD_TIME_SEC
 
     def __init__(self, pos, velocity, is_right_player):
         super().__init__()
