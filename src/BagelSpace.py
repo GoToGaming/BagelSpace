@@ -252,22 +252,29 @@ class SpaceBagels:
             self.detect_collisions()
         self.blit()
 
-    def _draw_text(self, string, size, x_middle, y_middle, color=yellow):
+    def draw_text(self, string, size, x_middle, y_middle, color=yellow):
         font = pygame.font.Font('freesansbold.ttf', size)
         text_surface = font.render(string, True, color)
         text_rect = text_surface.get_rect()
         text_rect.center = (x_middle, y_middle)
         self._screen.blit(text_surface, text_rect)
 
-    def _draw_text2(self, string, size, x, y, color=yellow):
+    def draw_text2(self, string, size, x, y, color=yellow):
         font = pygame.font.Font('freesansbold.ttf', size)
         text_surface = font.render(string, True, color)
         self._screen.blit(text_surface, (x, y))
+
+    def blit_status_bar(self):
+        self.draw_text2(f'{self.player_left.health_percentage}%', size=30, x=0, y=0, color=red)
+
+        self.draw_text2(f'{self.player_right.health_percentage}%', size=30, x=1000, y=0, color=blue)
 
     def blit(self):
         self._screen.blit(SPRITES[self.BACKGROUND_FILE_NAME], (0, 0))
         self.player_left.blit(self._screen)
         self.player_right.blit(self._screen)
+        self.blit_status_bar()
+
 
     def detect_collisions(self):
         player_left_objects = self.player_left.get_objects()
