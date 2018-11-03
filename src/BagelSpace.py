@@ -14,13 +14,18 @@ TARGET_FRAMETIME_MS = 1000. / TARGET_FPS
 SPRITES = {}
 
 
-# ############## Game Property configuration for game eperiance tuning #############################
+# ############## Game Property configuration for game experience tuning #############################
 
 GAME_SCALE = 2
 
 SPACE_SHIP_VELOCITY = 5
 SPACE_SHIP_HIGHT = 100
 
+
+METEORITE_TARGET_COUNT = 10
+METEORITE_HIGHT = 80
+MIN_METEORITE_SPEED = 1
+MAX_METEORITE_SPEED = 10
 
 
 
@@ -137,7 +142,7 @@ class Missile(pygame.sprite.Sprite):
 
 
 class MeteoriteController:
-    METEORITE_TARGET_COUNT = 15
+    METEORITE_TARGET_COUNT = METEORITE_TARGET_COUNT
     meteorites = []
 
     def tick(self):
@@ -152,8 +157,8 @@ class MeteoriteController:
     def spawn_meteorite(self):
         x = DESIRED_RESOLUTION[0] / 2
         y = rand.randint(0, DESIRED_RESOLUTION[1])
-        direction = rand.choice([-1,1])
-        speed = (rand.random()*2)+1
+        direction = rand.choice([-1, 1])
+        speed = (rand.random() * (MAX_METEORITE_SPEED - MIN_METEORITE_SPEED)) + MIN_METEORITE_SPEED
         meteorite = Meteorite((x, y), (speed*direction, 0))
         self.meteorites.append(meteorite)
 
@@ -171,7 +176,7 @@ class Meteorite(pygame.sprite.Sprite):
         self.velocity = np.array(velocity)
         self.health = 100.
 
-        self.sprite = load_image(self.METEORITE_FILE_NAME)
+        self.sprite = load_image(self.METEORITE_FILE_NAME, fixed_hight_pixels=METEORITE_HIGHT)
 
     def tick(self):
         self.position += self.velocity
