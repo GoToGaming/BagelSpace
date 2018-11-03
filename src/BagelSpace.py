@@ -19,13 +19,13 @@ SPRITES = {}
 GAME_SCALE = 2
 
 SPACE_SHIP_VELOCITY = 4
-SPACE_SHIP_HIGHT = 80
+SPACE_SHIP_HEIGHT = 80
 
 MISSILE_VELOCITY = 5
 MISSILE_RELOAD_TIME_SEC = 0.4
 
 METEORITE_TARGET_COUNT = 10
-METEORITE_HIGHT = 60
+METEORITE_HEIGHT = 60
 MIN_METEORITE_SPEED = 1
 MAX_METEORITE_SPEED = 4
 
@@ -297,7 +297,7 @@ class SpaceShip(pygame.sprite.Sprite):
             self.rearming_reload_ticks -= 1
         if self.firing and self.rearming_reload_ticks <= 0:
             self.missiles.append(Missile(self.calculate_missile_start_pos(), missile_velocity, is_right_player))
-            self.rearming_reload_ticks = int(Missile.RELOAD_TIME_SEC * 60)
+            self.rearming_reload_ticks = int(Missile.reload_time_sec * 60)
         for missile in self.missiles.copy():
             missile.tick()
             if 0 > missile.position[0] or missile.position[0] > DESIRED_RESOLUTION[0]:
