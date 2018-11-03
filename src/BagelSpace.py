@@ -423,23 +423,31 @@ class SpaceBagels:
         self.draw_text_centered(f'{int(np.ceil(self.player_right.health_percentage))}%', 30, 3*DESIRED_RESOLUTION[0]/4, 15, color=BLUE)
 
     def _detect_collisions(self):
+        self.compute_missile_ship_collisions()
+        self.compute_meteorite_ship_collisions()
+        self.compute_meteorite_missile_collisions()
+        self.compute_missile_missile_collisions()
+
+        if self.player_left.health_percentage == 0:
+            self.game_ended = SpaceShip.SPACE_SHIP_IS_RIGHT
+        if self.player_right.health_percentage == 0:
+            self.game_ended = SpaceShip.SPACE_SHIP_IS_LEFT
+
+    def compute_missile_ship_collisions(self):
         player_left_objects = self.player_left.get_objects()
         player_right_objects = self.player_right.get_objects()
 
-        # Missiles
         hit_left_player = pygame.sprite.spritecollideany(self.player_left, player_right_objects)
         if hit_left_player:
             self.player_right.missile_has_collided(hit_left_player)
-            if self.player_left.damage_ship(health_percentage_diff=10):
-                self.game_ended = SpaceShip.SPACE_SHIP_IS_RIGHT
+            self.player_left.damage_ship(health_percentage_diff=10)
 
         hit_right_player = pygame.sprite.spritecollideany(self.player_right, player_left_objects)
         if pygame.sprite.spritecollideany(self.player_right, player_left_objects):
             self.player_left.missile_has_collided(hit_right_player)
-            if self.player_right.damage_ship(health_percentage_diff=10):
-                self.game_ended = SpaceShip.SPACE_SHIP_IS_LEFT
+            self.player_right.damage_ship(health_percentage_diff=10)
 
-        # Meteorites
+    def compute_meteorite_ship_collisions(self):
         meteorites = self.meteorite_controller.meteorites
 
         hit_left_player = pygame.sprite.spritecollideany(self.player_left, meteorites)
@@ -449,6 +457,12 @@ class SpaceBagels:
         hit_right_player = pygame.sprite.spritecollideany(self.player_right, meteorites)
         if hit_right_player:
             self.player_right.damage_ship(health_percentage_diff=0.1)
+
+    def compute_meteorite_missile_collisions(self):
+        pass
+
+    def compute_missile_missile_collisions(self):
+        pass
 
     def _set_input_method(self, use_joystick):
         self.use_joystick = use_joystick
