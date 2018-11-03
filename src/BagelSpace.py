@@ -6,25 +6,26 @@ import pygame
 
 
 DESIRED_RESOLUTION = (1280, 720)
+SPRITES = {}
 
 
 class Missile(pygame.sprite.Sprite):
-    SPRITE = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'img', 'machine_gun_bullet1.png'))
+    MISSILE_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'machine_gun_bullet1.png')
 
-    def __init__(self, pos, vel):
+    def __init__(self, pos, velocity):
         super().__init__()
         self.position = np.array(pos)
-        self.velocity = np.array(vel)
+        self.velocity = np.array(velocity)
 
     def tick(self):
         self.position += self.velocity
 
     def blit(self, screen):
-        screen.blit(self.SPRITE, self.position)
+        screen.blit(SPRITES[self.MISSILE_FILE_NAME], self.position)
 
     @property
     def rect(self):
-        rect = self.SPRITE.get_rect()
+        rect = SPRITES[self.MISSILE_FILE_NAME].get_rect()
         rect.x, rect.y = self.position
         return rect
 
@@ -32,25 +33,24 @@ class Missile(pygame.sprite.Sprite):
 class SpaceShip(pygame.sprite.Sprite):
     SPACE_SHIP_IS_LEFT = 1
     SPACE_SHIP_IS_RIGHT = 2
-    SPRITE_LEFT = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'img', 'red_ship_1.png'))
-    SPRITE_RIGHT = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'img', 'blue_ship.png'))
-    SPACE_SHIP_LEFT_BOUND = np.array([[0,0],
-                                      np.array([DESIRED_RESOLUTION[0] / 2, DESIRED_RESOLUTION[1]]) - SPRITE_LEFT.get_size()])
-    SPACE_SHIP_RIGHT_BOUND = np.array([[DESIRED_RESOLUTION[0] / 2,0],
-                                      np.array(DESIRED_RESOLUTION) - SPRITE_LEFT.get_size()])
+    SPRITE_LEFT_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'red_ship_1.png')
+    SPRITE_RIGHT_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'blue_ship.png')
     DEFAULT_VELOCITY = 3
     MIDDLE_POS = DESIRED_RESOLUTION[0] / 2
 
-    def __init__(self, position, space_ship_side):
+    def __init__(self, position, space_ship_side, sprite):
         super().__init__()
         self.position = np.array(position)
         self.space_ship_side = space_ship_side
+        self.sprite = sprite
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
-            if any(self.SPACE_SHIP_LEFT_BOUND[0] > self.position) or any(self.position > self.SPACE_SHIP_LEFT_BOUND[1]):
-                raise ValueError
+            self.space_ship_bound = np.array([[0,0],
+                                      np.array([DESIRED_RESOLUTION[0] / 2, DESIRED_RESOLUTION[1]]) - self.sprite.get_size()])
         else:
-            if any(self.SPACE_SHIP_RIGHT_BOUND[0] > self.position) or any(self.position > self.SPACE_SHIP_RIGHT_BOUND[1]):
-                raise ValueError
+            self.space_ship_bound = np.array([[DESIRED_RESOLUTION[0] / 2,0],
+                                       np.array(DESIRED_RESOLUTION) - self.sprite.get_size()])
+        if any(self.space_ship_bound[0] > self.position) or any(self.position > self.space_ship_bound[1]):
+            raise ValueError
         self.velocity = np.array([0, 0])
         self.firing = False
         self.missiles = []
@@ -68,10 +68,10 @@ class SpaceShip(pygame.sprite.Sprite):
     def tick(self):
         new_position = self.position + self.velocity
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
-            self.position = np.clip(new_position, [0,0], np.array([self.MIDDLE_POS,DESIRED_RESOLUTION[1]])-self.SPRITE_LEFT.get_size())
+            self.position = np.clip(new_position, [0,0], np.array([self.MIDDLE_POS,DESIRED_RESOLUTION[1]])-self.sprite.get_size())
             missile_velocity = (3, 0)
         else:
-            self.position = np.clip(new_position, [self.MIDDLE_POS,0], np.array(DESIRED_RESOLUTION)-self.SPRITE_RIGHT.get_size())
+            self.position = np.clip(new_position, [self.MIDDLE_POS,0], np.array(DESIRED_RESOLUTION)-self.sprite.get_size())
             missile_velocity = (-3, 0)
         if self.firing:
             self.missiles.append(Missile(self.position, missile_velocity))
@@ -81,19 +81,13 @@ class SpaceShip(pygame.sprite.Sprite):
                 self.missiles.remove(missile)
 
     def blit(self, screen):
-        if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
-            screen.blit(self.SPRITE_LEFT, self.position)
-        else:
-            screen.blit(self.SPRITE_RIGHT, self.position)
+        screen.blit(self.sprite, self.position)
         for missile in self.missiles:
             missile.blit(screen)
 
     @property
     def rect(self):
-        if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
-            rect = self.SPRITE_LEFT.get_rect()
-        else:
-            rect = self.SPRITE_RIGHT.get_rect()
+        rect = self.sprite.get_rect()
         rect.x, rect.y = self.position
         return rect
 
@@ -102,11 +96,12 @@ class SpaceShip(pygame.sprite.Sprite):
 
 
 class SpaceBagels:
-    def __init__(self):
-        self._screen = pygame.display.set_mode(DESIRED_RESOLUTION)
-        pygame.display.set_caption('SpaceBagels')
-        self.player_left = SpaceShip((100, 360), SpaceShip.SPACE_SHIP_IS_LEFT)
-        self.player_right = SpaceShip((1180, 360), SpaceShip.SPACE_SHIP_IS_RIGHT)
+    BACKGROUND_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'background.png')
+
+    def __init__(self, screen):
+        self._screen = screen
+        self.player_left = SpaceShip((100, 360), SpaceShip.SPACE_SHIP_IS_LEFT, SPRITES[SpaceShip.SPRITE_LEFT_FILE_NAME])
+        self.player_right = SpaceShip((1180, 360), SpaceShip.SPACE_SHIP_IS_RIGHT, SPRITES[SpaceShip.SPRITE_RIGHT_FILE_NAME])
 
     def process_input(self, event):
         if event.dict['joy'] == 0:
@@ -122,6 +117,7 @@ class SpaceBagels:
         self.blit()
 
     def blit(self):
+        self._screen.blit(SPRITES[self.BACKGROUND_FILE_NAME], (0, 0))
         self.player_left.blit(self._screen)
         self.player_right.blit(self._screen)
 
@@ -134,6 +130,33 @@ class SpaceBagels:
             print("Player Right hit")
 
 
+class GameMenu:
+    def __init__(self, screen):
+        self._screen = screen
+        self.game = SpaceBagels(self._screen)
+
+    def process_input(self, event):
+        if event.type in (pygame.JOYHATMOTION, pygame.JOYBUTTONDOWN, pygame.JOYBUTTONUP):
+            self.game.process_input(event)
+        elif event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    def tick(self, tick_count):
+        self.game.tick(tick_count)
+
+    def blit(self):
+        self.game.blit()
+
+    def select_input_method(self):
+        pygame.joystick.init()
+        if pygame.joystick.get_count() >= 2:
+            print('Keyboard or joystick?')
+        joysticks = [pygame.joystick.Joystick(idx) for idx in range(2)]
+        for joystick in joysticks:
+            joystick.init()
+
+
 def main():
     pygame.init()
 
@@ -143,31 +166,25 @@ def main():
 
     clock = pygame.time.Clock()
 
-    pygame.joystick.init()
-    if pygame.joystick.get_count() < 2:
-        print('Need at least two controllers to play.')
-        pygame.quit()
-        sys.exit()
-    joysticks = [pygame.joystick.Joystick(idx) for idx in range(2)]
-    for joystick in joysticks:
-        joystick.init()
+    screen = pygame.display.set_mode(DESIRED_RESOLUTION)
+    pygame.display.set_caption('SpaceBagels')
 
-    game = SpaceBagels()
+    SPRITES[SpaceBagels.BACKGROUND_FILE_NAME] = pygame.image.load(SpaceBagels.BACKGROUND_FILE_NAME).convert()
+    SPRITES[SpaceShip.SPRITE_LEFT_FILE_NAME] = pygame.image.load(SpaceShip.SPRITE_LEFT_FILE_NAME).convert_alpha()
+    SPRITES[SpaceShip.SPRITE_RIGHT_FILE_NAME] = pygame.image.load(SpaceShip.SPRITE_RIGHT_FILE_NAME).convert_alpha()
+    SPRITES[Missile.MISSILE_FILE_NAME] = pygame.image.load(Missile.MISSILE_FILE_NAME).convert_alpha()
+
+    menu = GameMenu(screen)
 
     while True:
         for event in pygame.event.get():
-            if event.type in (pygame.JOYHATMOTION, pygame.JOYBUTTONDOWN, pygame.JOYBUTTONUP):
-                print(event)
-                game.process_input(event)
-            elif event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+            menu.process_input(event)
 
         last_frametime += clock.tick()
         tick_count = int(last_frametime // target_frametime_ms)
         last_frametime = last_frametime % target_frametime_ms
 
-        game.tick(tick_count)
+        menu.tick(tick_count)
         pygame.display.flip()
 
 
