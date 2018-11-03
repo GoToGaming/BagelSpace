@@ -397,7 +397,7 @@ class GameMenu:
         if pygame.joystick.get_count() < 2:
             options = [('Keyboard', 'Keyboard')]
         else:
-            options = [('Keyboard', 'Keyboard'), ('Joystick', 'Joystick')]
+            options = [('Joystick', 'Joystick'), ('Keyboard', 'Keyboard')]
         settings_menu.add_selector('Input',
                                    options,
                                    onreturn=None,
