@@ -74,6 +74,7 @@ class Animation:
 
 class Missile(pygame.sprite.Sprite):
     MISSILE_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'rocket')
+    reload_time_sec = 0.5
 
     def __init__(self, pos, velocity):
         super().__init__()
@@ -111,6 +112,7 @@ class SpaceShip(pygame.sprite.Sprite):
         self.sprite = load_image(sprite_path, GAME_SCALE)
         self.health_percentage = 100
         self.ship_destroyed = False
+        self.reaming_reload_ticks = 0
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
             self.space_ship_bound = np.array([[0,0],
                                       np.array([DESIRED_RESOLUTION[0] / 2, DESIRED_RESOLUTION[1]]) - self.sprite.get_size()])
@@ -147,6 +149,9 @@ class SpaceShip(pygame.sprite.Sprite):
         elif event.type == pygame.JOYBUTTONDOWN:
             self.firing = True
 
+    def calculate_missile_start_pos(self):
+        return self.position + np.array([0, int(self.sprite.get_size()[1] / 2)])
+
     def tick(self):
         new_position = self.position + self.velocity
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
@@ -155,8 +160,12 @@ class SpaceShip(pygame.sprite.Sprite):
         else:
             self.position = np.clip(new_position, [self.MIDDLE_POS,0], np.array(DESIRED_RESOLUTION)-self.sprite.get_size())
             missile_velocity = (-3, 0)
-        if self.firing:
-            self.missiles.append(Missile(self.position, missile_velocity))
+
+        if self.reaming_reload_ticks > 0:
+            self.reaming_reload_ticks -= 1
+        if self.firing and self.reaming_reload_ticks <= 0:
+            self.missiles.append(Missile(self.calculate_missile_start_pos(), missile_velocity))
+            self.reaming_reload_ticks = int(Missile.reload_time_sec * 60)
         for missile in self.missiles.copy():
             missile.tick()
             if 0 > missile.position[0] or missile.position[0] > DESIRED_RESOLUTION[0]:
