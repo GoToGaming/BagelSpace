@@ -20,9 +20,12 @@ class MeteoriteController:
                 self.meteorites.remove(meteorite)
 
     def spawn_meteorite(self):
-        x = Constants.DESIRED_RESOLUTION[0] / 2
-        y = rand.randint(0, Constants.DESIRED_RESOLUTION[1])
         direction = rand.choice([-1, 1])
+        if direction == 1:
+            x = Constants.DESIRED_RESOLUTION[0] / 2
+        else:
+            x = Constants.DESIRED_RESOLUTION[0] / 2 - Constants.METEORITE_HEIGHT  # not exact with would need to be subtracted
+        y = rand.randint(0, Constants.DESIRED_RESOLUTION[1] - Constants.METEORITE_HEIGHT)
         meteorite_speed_range = Constants.MAX_METEORITE_SPEED - Constants.MIN_METEORITE_SPEED
         speed = (rand.random() * meteorite_speed_range) + Constants.MIN_METEORITE_SPEED
         meteorite = Meteorite((x, y), (speed*direction, 0))
