@@ -5,6 +5,9 @@ import pygame
 DESIRED_RESOLUTION = (1280, 720)
 TARGET_FPS = 60
 TARGET_FRAMETIME_MS = 1000. / TARGET_FPS
+
+# ############## game play calibration #######################
+
 GAME_SCALE = 2
 SPACE_SHIP_VELOCITY = 4
 SPACE_SHIP_HEIGHT = 80
@@ -40,4 +43,5 @@ WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
+LIGHT_BLUE = (50, 240, 255)
 YELLOW = (255, 255, 0)

@@ -145,7 +145,7 @@ class Main:
                                 30,
                                 3 * Constants.DESIRED_RESOLUTION[0] / 4,
                                 15,
-                                color=Constants.BLUE)
+                                color=Constants.LIGHT_BLUE)
 
     def _detect_collisions(self):
         self.compute_missile_ship_collisions()
