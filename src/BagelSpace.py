@@ -9,10 +9,23 @@ from pygameMenu.locals import *
 
 
 DESIRED_RESOLUTION = (1280, 720)
-GAME_SCALE = 2
 TARGET_FPS = 60
 TARGET_FRAMETIME_MS = 1000. / TARGET_FPS
 SPRITES = {}
+
+
+# ############## Game Property configuration for game eperiance tuning #############################
+
+GAME_SCALE = 2
+
+SPACE_SHIP_VELOCITY = 5
+SPACE_SHIP_HIGHT = 100
+
+
+
+
+# ###################################################################################################
+
 
 
 class Button(Enum):
@@ -42,10 +55,16 @@ blue = (0, 0, 255)
 yellow = (255, 255, 0)
 
 
-def load_image(path, scale=1, animation=False, flip_x=False, flip_y=False, alpha=True):
+def load_image(path, scale=1, animation=False, flip_x=False, flip_y=False, alpha=True, fixed_hight_pixels=None):
     if not animation:
         image = pygame.image.load(path)
-        image = pygame.transform.scale(image, [x * scale for x in image.get_size()])
+        if not fixed_hight_pixels:
+            image = pygame.transform.scale(image, [x * scale for x in image.get_size()])
+        else:
+            unscaled_width, unscaled_height = image.get_size()
+            width = unscaled_width * fixed_hight_pixels / unscaled_height
+            image = pygame.transform.scale(image, [int(width), int(fixed_hight_pixels)])
+
         image = pygame.transform.flip(image, flip_x, flip_y)
         if alpha:
             image = image.convert_alpha()
@@ -122,7 +141,7 @@ class SpaceShip(pygame.sprite.Sprite):
     SPACE_SHIP_IS_RIGHT = 2
     SPRITE_LEFT_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'red_ship_1.png')
     SPRITE_RIGHT_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'blue_ship.png')
-    DEFAULT_VELOCITY = 3
+    DEFAULT_VELOCITY = SPACE_SHIP_VELOCITY
     MIDDLE_POS = DESIRED_RESOLUTION[0] / 2
 
     def __init__(self, position, space_ship_side, sprite):
@@ -241,9 +260,9 @@ class SpaceBagels:
     def __init__(self, screen, clock):
         self._screen = screen
         self._clock = clock
-        player_left_sprite = load_image(SpaceShip.SPRITE_LEFT_FILE_NAME, GAME_SCALE)
+        player_left_sprite = load_image(SpaceShip.SPRITE_LEFT_FILE_NAME,  fixed_hight_pixels=SPACE_SHIP_HIGHT)
         self.player_left = SpaceShip((200, 360), SpaceShip.SPACE_SHIP_IS_LEFT, player_left_sprite)
-        player_right_sprite = load_image(SpaceShip.SPRITE_RIGHT_FILE_NAME, GAME_SCALE)
+        player_right_sprite = load_image(SpaceShip.SPRITE_RIGHT_FILE_NAME,  fixed_hight_pixels=SPACE_SHIP_HIGHT)
         self.player_right = SpaceShip((1000, 360), SpaceShip.SPACE_SHIP_IS_RIGHT, player_right_sprite)
         self.running = True
         self.last_frametime = 0
