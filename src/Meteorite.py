@@ -39,7 +39,9 @@ class MeteoriteController:
 
 
 class Meteorite(pygame.sprite.Sprite):
-    METEORITE_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'meteorite.png')
+    METEORITE_FILE_NAMES = [os.path.join(os.path.dirname(__file__), '..', 'img', 'meteorite.png'),
+                            os.path.join(os.path.dirname(__file__), '..', 'img', 'meteorite1.png'),
+                            os.path.join(os.path.dirname(__file__), '..', 'img', 'meteorite2.png')]
 
     def __init__(self, pos, velocity, health):
         super().__init__()
@@ -48,7 +50,7 @@ class Meteorite(pygame.sprite.Sprite):
         self.health = float(health)
         self.scrape_sound_played = False
 
-        self.sprite = Tools.load_image(self.METEORITE_FILE_NAME, fixed_hight_pixels=Constants.METEORITE_HEIGHT)
+        self.sprite = Tools.load_image(rand.choice(self.METEORITE_FILE_NAMES), fixed_hight_pixels=Constants.METEORITE_HEIGHT)
         alpha = np.log10(self.health)
         alpha = np.clip(alpha * 100, Constants.MIN_METEORITE_SPRITE_ALPHA, Constants.MAX_METEORITE_SPRITE_ALPHA)
         alpha = 255 - alpha

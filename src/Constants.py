@@ -7,6 +7,7 @@ TARGET_FPS = 60
 TARGET_FRAMETIME_MS = 1000. / TARGET_FPS
 MENU_WIDTH = 800
 MENU_HEIGHT = 500
+BUTTON_HEIGHT = 50
 
 # ############## game play calibration #######################
 

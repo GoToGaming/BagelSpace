@@ -11,6 +11,8 @@ from src.Meteorite import MeteoriteController
 
 class SpaceBagels:
     BACKGROUND_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'background.png')
+    XBOX_X_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'Xbox_button_X.svg.png')
+    XBOX_B_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'Xbox_button_B.svg.png')
 
     def __init__(self, screen, clock, sound):
         self._screen = screen
@@ -21,6 +23,8 @@ class SpaceBagels:
         self.player_left = SpaceShip((200, 360), SpaceShip.SPACE_SHIP_IS_LEFT, player_left_sprite, sound)
         player_right_sprite = Tools.load_image(SpaceShip.SPRITE_RIGHT_FILE_NAME, fixed_hight_pixels=Constants.SPACE_SHIP_HEIGHT)
         self.player_right = SpaceShip((1000, 360), SpaceShip.SPACE_SHIP_IS_RIGHT, player_right_sprite, sound)
+        self._xbox_x_sprite = Tools.load_image(self.XBOX_X_FILE_NAME, fixed_hight_pixels=Constants.BUTTON_HEIGHT)
+        self._xbox_b_sprite = Tools.load_image(self.XBOX_B_FILE_NAME, fixed_hight_pixels=Constants.BUTTON_HEIGHT)
         self.meteorite_controller = MeteoriteController()
         self.powerup_controller = PowerUpController(sound)
         self.running = True
@@ -118,6 +122,7 @@ class SpaceBagels:
             self.player_left.blit(self._screen)
             self.player_right.blit(self._screen)
             self._blit_status_bar()
+            self._blit_buttons()
 
     def _blit_game_ended_screen(self):
         res = np.array(Constants.DESIRED_RESOLUTION)
@@ -154,6 +159,46 @@ class SpaceBagels:
                                 3 * Constants.DESIRED_RESOLUTION[0] / 4,
                                 15,
                                 color=Constants.LIGHT_BLUE)
+
+    def _blit_buttons(self):
+        font_size = 25
+        if self.use_joystick:
+            x_pos = (75,
+                     Constants.DESIRED_RESOLUTION[1] - 50 - self._xbox_x_sprite.get_height())
+            self._screen.blit(self._xbox_x_sprite, x_pos)
+            self.draw_text_centered('Change', font_size, x_pos[0] + self._xbox_x_sprite.get_width() / 2, x_pos[1] + self._xbox_x_sprite.get_height() + font_size, color=Constants.BLUE)
+            b_pos = (x_pos[0] + self._xbox_x_sprite.get_width() + 100,
+                     Constants.DESIRED_RESOLUTION[1] - 50 - self._xbox_b_sprite.get_height())
+            self._screen.blit(self._xbox_b_sprite, b_pos)
+            self.draw_text_centered('Fire', font_size, b_pos[0] + self._xbox_x_sprite.get_width() / 2, b_pos[1] + self._xbox_x_sprite.get_height() + font_size, color=Constants.RED)
+
+            b_pos = (Constants.DESIRED_RESOLUTION[0] - self._xbox_b_sprite.get_width() - 50,
+                     Constants.DESIRED_RESOLUTION[1] - 50 - self._xbox_b_sprite.get_height())
+            self._screen.blit(self._xbox_b_sprite, b_pos)
+            self.draw_text_centered('Fire', font_size, b_pos[0] + self._xbox_x_sprite.get_width() / 2, b_pos[1] + self._xbox_x_sprite.get_height() + font_size, color=Constants.RED)
+            x_pos = (b_pos[0] - 100 - self._xbox_x_sprite.get_width(),
+                     Constants.DESIRED_RESOLUTION[1] - 50 - self._xbox_x_sprite.get_height())
+            self._screen.blit(self._xbox_x_sprite, x_pos)
+            self.draw_text_centered('Change', font_size, x_pos[0] + self._xbox_x_sprite.get_width() / 2, x_pos[1] + self._xbox_x_sprite.get_height() + font_size, color=Constants.BLUE)
+        else:
+            key_font_size = 30
+            x_pos = (100,
+                     Constants.DESIRED_RESOLUTION[1] - 75)
+            self.draw_text_centered('L ALT', key_font_size, x_pos[0], x_pos[1], color=Constants.BLUE)
+            self.draw_text_centered('Change', font_size, x_pos[0], x_pos[1] + 25 + font_size, color=Constants.BLUE)
+            b_pos = (x_pos[0] + 165,
+                     Constants.DESIRED_RESOLUTION[1] - 75)
+            self.draw_text_centered('SPACE', key_font_size, b_pos[0], b_pos[1], color=Constants.RED)
+            self.draw_text_centered('Fire', font_size, b_pos[0], b_pos[1] + 25 + font_size, color=Constants.RED)
+
+            b_pos = (Constants.DESIRED_RESOLUTION[0] - 100,
+                     Constants.DESIRED_RESOLUTION[1] - 75)
+            self.draw_text_centered('ENTER', key_font_size, b_pos[0], b_pos[1], color=Constants.RED)
+            self.draw_text_centered('Fire', font_size, b_pos[0], b_pos[1] + 25 + font_size, color=Constants.RED)
+            x_pos = (b_pos[0] - 175,
+                     Constants.DESIRED_RESOLUTION[1] - 75)
+            self.draw_text_centered('DELETE', key_font_size, x_pos[0], x_pos[1], color=Constants.BLUE)
+            self.draw_text_centered('Change', font_size, x_pos[0], x_pos[1] + 25 + font_size, color=Constants.BLUE)
 
     def _detect_collisions(self):
         self.compute_projectile_ship_collisions()
