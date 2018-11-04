@@ -54,6 +54,25 @@ class GameMenu:
                                         window_width=Constants.DESIRED_RESOLUTION[0],
                                         window_height=Constants.DESIRED_RESOLUTION[1])
 
+        def _select_difficulty(method):
+            if method == 'Easy':
+                Constants.TARGET_FPS = 30
+            elif method == 'Medium':
+                Constants.TARGET_FPS = 60
+            elif method == 'Hard':
+                Constants.TARGET_FPS = 90
+            elif method == 'Insane':
+                Constants.TARGET_FPS = 120
+            else:
+                raise ValueError
+            Constants.TARGET_FRAMETIME_MS = 1000. / Constants.TARGET_FPS
+
+        difficulty_options = [('Medium', 'Medium'), ('Hard', 'Hard'), ('Insane', 'Insane'), ('Easy', 'Easy')]
+        settings_menu.add_selector('Difficulty',
+                                   difficulty_options,
+                                   onreturn=None,
+                                   onchange=_select_difficulty)
+
         def _select_input_method(method):
             if method == 'Keyboard':
                 self.use_joystick = False
@@ -64,11 +83,11 @@ class GameMenu:
             self.game._set_input_method(self.use_joystick)
 
         if pygame.joystick.get_count() < 2:
-            options = [('Keyboard', 'Keyboard')]
+            input_options = [('Keyboard', 'Keyboard')]
         else:
-            options = [('Joystick', 'Joystick'), ('Keyboard', 'Keyboard')]
+            input_options = [('Joystick', 'Joystick'), ('Keyboard', 'Keyboard')]
         settings_menu.add_selector('Input',
-                                   options,
+                                   input_options,
                                    onreturn=None,
                                    onchange=_select_input_method)
 
@@ -82,9 +101,9 @@ class GameMenu:
             else:
                 raise ValueError
 
-        options = [('Windowed', 'Windowed'), ('Fullscreen', 'Fullscreen')]
+        graphics_options = [('Windowed', 'Windowed'), ('Fullscreen', 'Fullscreen')]
         settings_menu.add_selector('Graphics',
-                                   options,
+                                   graphics_options,
                                    onreturn=None,
                                    onchange=_select_graphics)
 

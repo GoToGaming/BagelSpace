@@ -17,7 +17,6 @@ class Sound:
 
     def start_menu_background_music(self):
         if not self.menu_music_is_playing:
-            print('menu sound set')
             file = 'Incoming_Transition.mp3'
             mixer.music.stop()
             mixer.music.load(os.path.join(sound_folder_path, "background", file))
