@@ -1,7 +1,7 @@
 import os
 from pygame import mixer
 
-sound_folder_path = os.path.join(os.path.dirname(os.getcwd()), 'sounds')
+sound_folder_path = os.path.join(os.path.dirname(__file__), '..', 'sounds')
 
 
 class Sound:
