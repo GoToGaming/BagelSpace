@@ -167,12 +167,12 @@ class SpaceBagels:
 
         collisions = pygame.sprite.spritecollide(self.player_left, player_right_objects, False)
         for collision in collisions:
-            self.player_right.projectile_has_collided(collision)
+            self.player_right.projectile_has_collided(collision, False)
             self.player_left.damage_ship(health_percentage_diff=collision.damage)
 
         collisions = pygame.sprite.spritecollide(self.player_right, player_left_objects, False)
         for collision in collisions:
-            self.player_left.projectile_has_collided(collision)
+            self.player_left.projectile_has_collided(collision, False)
             self.player_right.damage_ship(health_percentage_diff=collision.damage)
 
     def compute_meteorite_ship_collisions(self):
@@ -205,8 +205,12 @@ class SpaceBagels:
             if meteorite.health == 0:
                 self.meteorite_controller.meteorites.remove(meteorite)
 
-        self.player_left.projectiles = [projectile for projectile in projectiles_left]
-        self.player_right.projectiles = [projectile for projectile in projectiles_right]
+        for projectiles in collision_dict_left.values():
+            for projectile in projectiles:
+                self.player_left.projectile_has_collided(projectile, True)
+        for projectiles in collision_dict_right.values():
+            for projectile in projectiles:
+                self.player_right.projectile_has_collided(projectile, True)
 
     def compute_projectile_projectile_collisions(self):
         projectiles_left = pygame.sprite.Group(projectile for projectile in self.player_left.projectiles)

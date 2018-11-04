@@ -66,15 +66,22 @@ class MachineGunProjectile(pygame.sprite.Sprite):
 
 
 class MachineGunImpactEffect(pygame.sprite.Sprite):
+    MACHINE_GUN_IMPACT_EFFECT_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'mg_impact')
+    MACHINE_GUN_IMPACT_METEOROID_EFFECT_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'mg_impact_met')
 
-    Machine_GUN_IMPACT_EFFECT_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'mg_impact')
-
-    def __init__(self, position):
+    def __init__(self, position, is_meteoroid_collision):
         super().__init__()
 
         self.effect_speed = 2
-        self.animation = Animation(load_image(self.Machine_GUN_IMPACT_EFFECT_FILE_NAME, Constants.GAME_SCALE,
-                                              animation=True), self.effect_speed)
+        if is_meteoroid_collision:
+            self.animation = Animation(
+                load_image(self.MACHINE_GUN_IMPACT_METEOROID_EFFECT_FILE_NAME, Constants.GAME_SCALE,
+                           animation=True), self.effect_speed)
+        else:
+            self.animation = Animation(
+                load_image(self.MACHINE_GUN_IMPACT_EFFECT_FILE_NAME, Constants.GAME_SCALE,
+                           animation=True), self.effect_speed)
+
         self.effect_counter = self.effect_speed * len(self.animation.animation)
         self.position = position
 

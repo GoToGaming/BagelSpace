@@ -117,8 +117,8 @@ class SpaceShip(pygame.sprite.Sprite):
             if effect.tick():
                 self.effects.remove(effect)
 
-    def projectile_has_collided(self, projectile):
-        self.effects.append(projectile.on_collision_effect(projectile.position))
+    def projectile_has_collided(self, projectile, is_meteoroid_collision):
+        self.effects.append(projectile.on_collision_effect(projectile.position, is_meteoroid_collision))
         self.projectiles.remove(projectile)
 
     def blit(self, screen):
