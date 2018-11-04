@@ -22,7 +22,7 @@ class SpaceBagels:
         player_right_sprite = Tools.load_image(SpaceShip.SPRITE_RIGHT_FILE_NAME, fixed_hight_pixels=Constants.SPACE_SHIP_HEIGHT)
         self.player_right = SpaceShip((1000, 360), SpaceShip.SPACE_SHIP_IS_RIGHT, player_right_sprite, sound)
         self.meteorite_controller = MeteoriteController()
-        self.powerup_controller = PowerUpController()
+        self.powerup_controller = PowerUpController(sound)
         self.running = True
         self.game_ended = ''
         self.game_ended_time = 0

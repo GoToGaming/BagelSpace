@@ -15,8 +15,9 @@ class PowerUpController:
     powerups = []
     ticks_since_last_powerup = 0
 
-    def __init__(self):
+    def __init__(self, sound):
         self.switch = rand.choice([-1,1])
+        self.sound = sound
 
     def tick(self):
         self.ticks_since_last_powerup += 1
@@ -35,7 +36,7 @@ class PowerUpController:
         y = rand.randint(100, Constants.DESIRED_RESOLUTION[1]-100)
         direction = self.switch * Constants.POWERUP_X_SPEED
         self.switch *= -1
-        powerup = PowerUp((x, y), direction)
+        powerup = PowerUp((x, y), direction, self.sound)
         powerup.position = np.array((powerup.position[0]-powerup.animation.get_current_image().get_size()[0], y))
         self.powerups.append(powerup)
 
@@ -50,7 +51,7 @@ class PowerUpController:
 class PowerUp(pygame.sprite.Sprite):
     POWERUP_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'blue_powerup')
 
-    def __init__(self, position, direction):
+    def __init__(self, position, direction, sound):
         super().__init__()
 
         self.animation = Animation(load_image(self.POWERUP_FILE_NAME, Constants.GAME_SCALE, animation=True), 5)
@@ -58,6 +59,7 @@ class PowerUp(pygame.sprite.Sprite):
         self.position = position
         self.velocity = np.array((direction, 0))
         self.timer = 0
+        self.sound = sound
 
     def tick(self):
         self.timer += 0.1
@@ -83,3 +85,4 @@ class PowerUp(pygame.sprite.Sprite):
 
     def collected(self, player):
         player.increase_health_percentage(Constants.POWERUP_HEALTH)
+        self.sound.play_heal()

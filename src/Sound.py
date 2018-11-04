@@ -11,6 +11,7 @@ class Sound:
         mixer.init()
         self.machine_gun_shot = mixer.Sound(os.path.join(sound_folder_path, 'machinegun-single-shot-9db.wav'))
         self.missile_shot = mixer.Sound(os.path.join(sound_folder_path, 'missile-shot.wav'))
+        self.heal = mixer.Sound(os.path.join(sound_folder_path, 'heal.wav'))
 
     def start_menu_background_music(self):
         if not self.menu_music_is_playing:
@@ -34,3 +35,6 @@ class Sound:
 
     def play_missile_shot(self):
         self.missile_shot.play()
+
+    def play_heal(self):
+        self.heal.play()
