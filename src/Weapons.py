@@ -6,7 +6,6 @@ import pygame
 
 
 class MachineGun:
-
     def __init__(self, is_right_player, offset):
         self.fire_rate = Constants.MACHINE_GUN_FIRE_RATE
         self.cooldown = self.fire_rate
@@ -32,7 +31,6 @@ class MachineGun:
 
 
 class MachineGunProjectile(pygame.sprite.Sprite):
-
     MACHINE_GUN_PROJECTILE_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'machine_gun_bullet')
 
     def __init__(self, position, velocity, is_player_right):

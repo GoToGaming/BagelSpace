@@ -165,25 +165,25 @@ class Main:
         player_left_objects = self.player_left.get_objects()
         player_right_objects = self.player_right.get_objects()
 
-        hit_left_player = pygame.sprite.spritecollideany(self.player_left, player_right_objects)
-        if hit_left_player:
-            self.player_right.projectile_has_collided(hit_left_player)
-            self.player_left.damage_ship(health_percentage_diff=hit_left_player.damage)
+        collisions = pygame.sprite.spritecollide(self.player_left, player_right_objects, False)
+        for collision in collisions:
+            self.player_right.projectile_has_collided(collision)
+            self.player_left.damage_ship(health_percentage_diff=collision.damage)
 
-        hit_right_player = pygame.sprite.spritecollideany(self.player_right, player_left_objects)
-        if pygame.sprite.spritecollideany(self.player_right, player_left_objects):
-            self.player_left.projectile_has_collided(hit_right_player)
-            self.player_right.damage_ship(health_percentage_diff=hit_right_player.damage)
+        collisions = pygame.sprite.spritecollide(self.player_right, player_left_objects, False)
+        for collision in collisions:
+            self.player_left.projectile_has_collided(collision)
+            self.player_right.damage_ship(health_percentage_diff=collision.damage)
 
     def compute_meteorite_ship_collisions(self):
-        meteorites = self.meteorite_controller.meteorites
+        meteorites = pygame.sprite.Group(meteorite for meteorite in self.meteorite_controller.meteorites)
 
-        hit_left_player = pygame.sprite.spritecollideany(self.player_left, meteorites)
-        if hit_left_player:
+        collisions = pygame.sprite.spritecollide(self.player_left, meteorites, False)
+        for collision in collisions:
             self.player_left.damage_ship(health_percentage_diff=0.1)
 
-        hit_right_player = pygame.sprite.spritecollideany(self.player_right, meteorites)
-        if hit_right_player:
+        collisions = pygame.sprite.spritecollide(self.player_right, meteorites, False)
+        for collision in collisions:
             self.player_right.damage_ship(health_percentage_diff=0.1)
 
     def compute_meteorite_projectile_collisions(self):
