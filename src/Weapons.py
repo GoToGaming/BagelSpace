@@ -43,7 +43,8 @@ class MachineGunProjectile(pygame.sprite.Sprite):
 
         self.animation = Animation(load_image(self.MACHINE_GUN_PROJECTILE_FILE_NAME, Constants.GAME_SCALE,
                                               animation=True, flip_x=is_player_right), 10)
-        self.position = position
+        self.position = np.array(position)
+        self.position[1] -= int(self.animation.get_current_image().get_height() / 2)
         self.velocity = velocity
 
         self.damage = Constants.MACHINE_GUN_PROJECTILE_DAMAGE

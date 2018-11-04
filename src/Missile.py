@@ -12,10 +12,12 @@ class Missile(pygame.sprite.Sprite):
 
     def __init__(self, pos, velocity, is_right_player):
         super().__init__()
+        self.animation = Animation.Animation(Tools.load_image(self.MISSILE_FILE_NAME, Constants.GAME_SCALE, animation=True, flip_x=is_right_player), 4)
+
         self.position = np.array(pos)
+        self.position[1] -= int(self.animation.get_current_image().get_height() / 2)
         self.velocity = np.array(velocity)
 
-        self.animation = Animation.Animation(Tools.load_image(self.MISSILE_FILE_NAME, Constants.GAME_SCALE, animation=True, flip_x=is_right_player), 4)
 
     def tick(self):
         self.position += self.velocity
