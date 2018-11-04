@@ -6,6 +6,7 @@ from pygameMenu.fonts import FONT_8BIT
 from src import Constants, Tools
 from src.SpaceShip import SpaceShip
 from src.Meteorite import MeteoriteController
+import src.Sound as sound
 
 
 class SpaceBagels:
@@ -29,6 +30,7 @@ class SpaceBagels:
     def main(self):
         self.running = True
         self._clock.tick()
+        sound.start_game_background_music()
 
         while True:
             playevents = pygame.event.get()

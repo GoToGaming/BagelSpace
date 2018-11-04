@@ -4,6 +4,7 @@ from pygameMenu.locals import *
 import sys
 
 from src import Constants, SpaceBagels
+import src.Sound as sound
 
 
 class GameMenu:
@@ -76,6 +77,7 @@ class GameMenu:
         self.menu.add_option('Exit', PYGAME_MENU_EXIT)
 
     def process_inputs(self, events):
+        sound.start_menu_background_music()
         self.menu.enable()
         for event in events:
             if event.type == pygame.QUIT:

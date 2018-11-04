@@ -20,13 +20,13 @@ class MachineGun:
 
     def fire(self, position):
         if self.cooldown == 0:
+            sound.machine_gun_shot.play()
             velocity_x = self.projectile_speed
             if self.is_right_player:
                 velocity_x = -velocity_x
             position[1] -= self.offset
             projectile = MachineGunProjectile(position, (velocity_x, 0), is_player_right=self.is_right_player)
             self.cooldown = self.fire_rate
-            sound.machine_gun_shot.play()
             return projectile
         return None
 
