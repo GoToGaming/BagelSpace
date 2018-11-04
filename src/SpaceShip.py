@@ -34,7 +34,7 @@ class SpaceShip(pygame.sprite.Sprite):
             raise ValueError
         self.velocity = np.array([0, 0])
         self.firing = False
-        self.missiles = []
+        self.projectiles = []
         self.weapons = []
         self.weapons.append(MachineGun(self.space_ship_side == self.SPACE_SHIP_IS_RIGHT, Constants.SPACE_SHIP_HEIGHT/10))
         self.weapons.append(MachineGun(self.space_ship_side == self.SPACE_SHIP_IS_RIGHT, -Constants.SPACE_SHIP_HEIGHT/10))
@@ -81,7 +81,7 @@ class SpaceShip(pygame.sprite.Sprite):
             if button == Constants.Button.FIRE:
                 self.firing = False
 
-    def calculate_missile_start_pos(self):
+    def calculate_projectile_start_pos(self):
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
             return self.position + np.array([self.sprite.get_size()[0], int(self.sprite.get_size()[1] / 2)])
         else:
@@ -100,20 +100,22 @@ class SpaceShip(pygame.sprite.Sprite):
             weapon.tick()
 
             if self.firing:
-                weapon.fire(self.calculate_missile_start_pos())
+                projectile = weapon.fire(self.calculate_projectile_start_pos())
+                if projectile:
+                    self.projectiles.append(projectile)
 
-        for missile in self.missiles.copy():
-            missile.tick()
-            if 0 > missile.position[0] or missile.position[0] > Constants.DESIRED_RESOLUTION[0]:
-                self.missiles.remove(missile)
+        for projectile in self.projectiles.copy():
+            projectile.tick()
+            if 0 > projectile.position[0] or projectile.position[0] > Constants.DESIRED_RESOLUTION[0]:
+                self.projectiles.remove(projectile)
 
-    def missile_has_collided(self, missile):
-        self.missiles.remove(missile)
+    def projectile_has_collided(self, projectile):
+        self.projectiles.remove(projectile)
 
     def blit(self, screen):
         screen.blit(self.sprite, self.position)
-        for missile in self.missiles:
-            missile.blit(screen)
+        for projectile in self.projectiles:
+            projectile.blit(screen)
         for weapon in self.weapons:
             weapon.blit(screen)
 
@@ -124,4 +126,4 @@ class SpaceShip(pygame.sprite.Sprite):
         return rect
 
     def get_objects(self):
-        return [self, *self.missiles]
+        return [self, *self.projectiles]
