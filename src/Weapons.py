@@ -4,6 +4,8 @@ from src.Tools import load_image
 from src.Constants import MACHINE_GUN_PROJECTILE_SPEED, MACHINE_GUN_FIRE_RATE, MACHINE_GUN_PROJECTILE_DAMAGE
 import pygame
 
+import src.Sound as sound
+
 
 class MachineGun:
 
@@ -23,7 +25,7 @@ class MachineGun:
             position[1] -= self.offset
             projectile = MachineGunProjectile(position, (velocity_x, 0), is_player_right=self.is_right_player)
             self.cooldown = self.fire_rate
-
+            sound.machine_gun_shot.play()
             return projectile
         return None
 
