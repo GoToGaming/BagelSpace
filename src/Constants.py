@@ -24,8 +24,10 @@ MAX_METEORITE_SPRITE_ALPHA = 192
 MIN_METEORITE_SPEED = 1
 MAX_METEORITE_SPEED = 4
 
+MISSILE_LAUNCHER_FIRE_RATE = 50
 MISSILE_VELOCITY = 5
 MISSILE_RELOAD_TIME_SEC = 0.4
+MISSILE_DAMAGE = 50
 
 MACHINE_GUN_PROJECTILE_SPEED = 20
 MACHINE_GUN_FIRE_RATE = 10
@@ -37,7 +39,8 @@ class Button(Enum):
     DOWN = 1,
     LEFT = 2,
     RIGHT = 3,
-    FIRE = 4
+    FIRE = 4,
+    SWITCH = 5
 
 
 KEYBOARD_MAPPING = {pygame.K_UP: Button.UP,
@@ -49,7 +52,9 @@ KEYBOARD_MAPPING = {pygame.K_UP: Button.UP,
                     pygame.K_RIGHT: Button.RIGHT,
                     pygame.K_d: Button.RIGHT,
                     pygame.K_SPACE: Button.FIRE,
-                    pygame.K_RETURN: Button.FIRE}
+                    pygame.K_RETURN: Button.FIRE,
+                    pygame.K_LALT: Button.SWITCH,
+                    pygame.K_DELETE: Button.SWITCH}
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
