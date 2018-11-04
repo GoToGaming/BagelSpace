@@ -65,7 +65,7 @@ class SpaceBagels:
         if self.use_joystick:
             if event.type in (pygame.JOYHATMOTION, pygame.JOYBUTTONUP, pygame.JOYBUTTONDOWN):
                 if event.type == pygame.JOYBUTTONDOWN and self.game_ended:
-                    if self.game_ended_time + 2500 < pygame.time.get_ticks():
+                    if self.game_ended_time + 5000 < pygame.time.get_ticks():
                         self.running = False
                         return
 
@@ -76,7 +76,7 @@ class SpaceBagels:
         else:
             if event.type in (pygame.KEYUP, pygame.KEYDOWN):
                 if event.type == pygame.KEYDOWN and self.game_ended:
-                    if self.game_ended_time + 2500 < pygame.time.get_ticks():
+                    if self.game_ended_time + 5000 < pygame.time.get_ticks():
                         self.running = False
                         return
 
@@ -116,8 +116,16 @@ class SpaceBagels:
         self.powerup_controller.blit(self._screen)
 
         if self.game_ended:
-            self._blit_game_ended_screen()
-            self._sound.start_menu_background_music()
+            if self.game_ended_time + 2500 > pygame.time.get_ticks():
+                if self.game_ended == SpaceShip.SPACE_SHIP_IS_RIGHT:
+                    self.player_left.blit_explosion(self._screen)
+                    self.player_right.blit(self._screen)
+                else:
+                    self.player_right.blit_explosion(self._screen)
+                    self.player_left.blit(self._screen)
+            else:
+                self._blit_game_ended_screen()
+                self._sound.start_menu_background_music()
         else:
             self.player_left.blit(self._screen)
             self.player_right.blit(self._screen)
@@ -140,7 +148,7 @@ class SpaceBagels:
                                 Constants.DESIRED_RESOLUTION[0] / 2,
                                 Constants.DESIRED_RESOLUTION[1] / 2,
                                 color=Constants.WHITE)
-        if self.game_ended_time + 2500 < pygame.time.get_ticks():
+        if self.game_ended_time + 5000 < pygame.time.get_ticks():
             font_size = 30
             self.draw_text_centered('Press any key to return to menu'.format(winner),
                                     font_size,

@@ -7,12 +7,16 @@ from src import Constants
 from src.Meteorite import Meteorite
 from src.Weapons import MachineGun, MissileLauncher
 
+from src.Tools import load_image
+from src.Animation import Animation
+
 
 class SpaceShip(pygame.sprite.Sprite):
     SPACE_SHIP_IS_LEFT = 'RED'
     SPACE_SHIP_IS_RIGHT = 'BLUE'
     SPRITE_LEFT_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'red_ship_1.png')
     SPRITE_RIGHT_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'blue_ship.png')
+    EXPLOSION_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'big_explosion')
     DEFAULT_VELOCITY = Constants.SPACE_SHIP_VELOCITY
     MIDDLE_POS = Constants.DESIRED_RESOLUTION[0] / 2
 
@@ -25,6 +29,15 @@ class SpaceShip(pygame.sprite.Sprite):
         self.health_percentage = 100
         self.ship_destroyed = False
         self.rearming_reload_ticks = 0
+
+        self.explosion = Animation(
+            load_image(
+                self.EXPLOSION_FILE_NAME,
+                Constants.GAME_SCALE,
+                True),
+            7
+        )
+
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
             self.space_ship_bound = np.array([[0, 0],
                                               np.array([Constants.DESIRED_RESOLUTION[0] / 2,
@@ -64,7 +77,7 @@ class SpaceShip(pygame.sprite.Sprite):
 
     def process_input(self, event, button):
         if event.type == pygame.JOYHATMOTION:
-            if event.dict['hat'] == 0:
+            if event.dict['hat'] == 0 and not self.ship_destroyed:
                 self.target_velocity = self.DEFAULT_VELOCITY * np.array(event.dict['value'])
                 self.target_velocity[1] *= -1
                 if event.dict['value'] == (0, 0):
@@ -127,8 +140,7 @@ class SpaceShip(pygame.sprite.Sprite):
             self.activate_bagel_mode()
 
     def activate_bagel_mode(self):
-        print('Bagel mode activated')
-        Meteorite.METEORITE_FILE_NAME = '/home/munzner/dev/BagelSpace/img/bagel.png'
+        Meteorite.METEORITE_FILE_NAMES = [os.path.join(os.path.dirname(Meteorite.METEORITE_FILE_NAMES[0]), 'bagel.png')]
 
     def calculate_projectile_start_pos(self):
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
@@ -147,8 +159,14 @@ class SpaceShip(pygame.sprite.Sprite):
             self.position = np.clip(new_position, [self.MIDDLE_POS, 0],
                                     np.array(Constants.DESIRED_RESOLUTION) - self.sprite.get_size())
 
+        if self.ship_destroyed:
+            self.explosion.update(False)
+
+        for weapon_set in self.weapons:
+            for weapon in weapon_set:
+                weapon.tick()
+
         for weapon in self.active_weapon:
-            weapon.tick()
 
             if self.firing:
                 projectile = weapon.fire(self.calculate_projectile_start_pos())
@@ -174,6 +192,9 @@ class SpaceShip(pygame.sprite.Sprite):
             projectile.blit(screen)
         for effect in self.effects:
             effect.blit(screen)
+
+    def blit_explosion(self, screen):
+        screen.blit(self.explosion.get_current_image(), self.position)
 
     @property
     def rect(self):
