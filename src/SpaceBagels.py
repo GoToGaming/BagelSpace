@@ -4,6 +4,7 @@ import pygame
 from pygameMenu.fonts import FONT_8BIT
 
 from src import Constants, Tools
+from src.PowerUp import PowerUpController
 from src.SpaceShip import SpaceShip
 from src.Meteorite import MeteoriteController
 
@@ -21,6 +22,7 @@ class SpaceBagels:
         player_right_sprite = Tools.load_image(SpaceShip.SPRITE_RIGHT_FILE_NAME, fixed_hight_pixels=Constants.SPACE_SHIP_HEIGHT)
         self.player_right = SpaceShip((1000, 360), SpaceShip.SPACE_SHIP_IS_RIGHT, player_right_sprite, sound)
         self.meteorite_controller = MeteoriteController()
+        self.powerup_controller = PowerUpController()
         self.running = True
         self.game_ended = ''
         self.game_ended_time = 0
@@ -87,6 +89,7 @@ class SpaceBagels:
             self.player_left.tick()
             self.player_right.tick()
             self.meteorite_controller.tick()
+            self.powerup_controller.tick()
             if not self.game_ended:
                 self._detect_collisions()
         self.blit()
@@ -106,6 +109,7 @@ class SpaceBagels:
     def blit(self):
         self._screen.blit(self.background_sprite, (0, 0))
         self.meteorite_controller.blit(self._screen)
+        self.powerup_controller.blit(self._screen)
 
         if self.game_ended:
             self._blit_game_ended_screen()
@@ -155,6 +159,7 @@ class SpaceBagels:
         self.compute_meteorite_ship_collisions()
         self.compute_meteorite_projectile_collisions()
         self.compute_projectile_projectile_collisions()
+        self.compute_powerup_ship_collisions()
 
         if self.player_left.health_percentage == 0:
             self.game_ended = SpaceShip.SPACE_SHIP_IS_RIGHT
@@ -222,6 +227,19 @@ class SpaceBagels:
 
         self.player_left.projectiles = [projectile for projectile in projectiles_left]
         self.player_right.projectiles = [projectile for projectile in projectiles_right]
+
+    def compute_powerup_ship_collisions(self):
+        powerups = pygame.sprite.Group(powerup for powerup in self.powerup_controller.powerups)
+
+        collisions = pygame.sprite.spritecollide(self.player_left, powerups, True)
+        for collided_powerup in collisions:
+            collided_powerup.collected(self.player_left)
+            self.powerup_controller.remove_powerup(collided_powerup)
+
+        collisions = pygame.sprite.spritecollide(self.player_right, powerups, True)
+        for collided_powerup in collisions:
+            collided_powerup.collected(self.player_right)
+            self.powerup_controller.remove_powerup(collided_powerup)
 
     def _set_input_method(self, use_joystick):
         self.use_joystick = use_joystick
