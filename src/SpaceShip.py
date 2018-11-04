@@ -39,9 +39,9 @@ class SpaceShip(pygame.sprite.Sprite):
         self.projectiles = []
         self.effects = []
         self.weapons = []
-        self.weapons.append([MachineGun(self.space_ship_side == self.SPACE_SHIP_IS_RIGHT, Constants.SPACE_SHIP_HEIGHT/10),
-                             MachineGun(self.space_ship_side == self.SPACE_SHIP_IS_RIGHT, -Constants.SPACE_SHIP_HEIGHT/10)])
-        self.weapons.append([MissileLauncher(self.space_ship_side == self.SPACE_SHIP_IS_RIGHT, 0)])
+        self.weapons.append([MachineGun(self.space_ship_side == self.SPACE_SHIP_IS_RIGHT, Constants.SPACE_SHIP_HEIGHT/10, self.sound),
+                             MachineGun(self.space_ship_side == self.SPACE_SHIP_IS_RIGHT, -Constants.SPACE_SHIP_HEIGHT/10, self.sound)])
+        self.weapons.append([MissileLauncher(self.space_ship_side == self.SPACE_SHIP_IS_RIGHT, 0, self.sound)])
         self._active_weapon_idx = 0
         self.active_weapon = self.weapons[self._active_weapon_idx]
 

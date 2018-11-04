@@ -53,8 +53,6 @@ class SpaceBagels:
             pygame.display.flip()
 
     def process_input(self, event):
-        print(event)
-
         if not self.running:
             return
 

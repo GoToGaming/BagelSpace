@@ -97,7 +97,8 @@ class MachineGunImpactEffect(pygame.sprite.Sprite):
 
 
 class MissileLauncher:
-    def __init__(self, is_right_player, offset):
+    def __init__(self, is_right_player, offset, sound):
+        self.sound = sound
         self.fire_rate = Constants.MISSILE_LAUNCHER_FIRE_RATE
         self.cooldown = self.fire_rate
         self.missile_speed = Constants.MACHINE_GUN_PROJECTILE_SPEED
