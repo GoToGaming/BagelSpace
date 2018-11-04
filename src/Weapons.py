@@ -1,8 +1,11 @@
 import os
+
+import numpy as np
+import pygame
+
+import src.Constants as Constants
 from src.Animation import Animation
 from src.Tools import load_image
-import src.Constants as Constants
-import pygame
 
 
 class MachineGun:
@@ -56,6 +59,9 @@ class MachineGunProjectile(pygame.sprite.Sprite):
     def rect(self):
         rect = self.animation.get_current_image().get_rect()
         rect.x, rect.y = self.position
+        diff = np.array(rect.size) * -0.1
+        diff = diff.astype(int)
+        rect = rect.inflate(*diff)
         return rect
 
 

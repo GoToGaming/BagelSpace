@@ -1,7 +1,8 @@
-import numpy as np
-import pygame
 import os
 import random as rand
+
+import numpy as np
+import pygame
 
 from src import Constants, Tools
 
@@ -62,6 +63,9 @@ class Meteorite(pygame.sprite.Sprite):
     def rect(self):
         rect = self.sprite.get_rect()
         rect.x, rect.y = self.position
+        diff = np.array(rect.size) * -0.1
+        diff = diff.astype(int)
+        rect = rect.inflate(*diff)
         return rect
 
     def damage_meteorite(self, diff):

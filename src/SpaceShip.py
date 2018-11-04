@@ -1,9 +1,9 @@
-import numpy as np
 import os
+
+import numpy as np
 import pygame
 
 from src import Constants
-from src.Missile import Missile
 from src.Weapons import MachineGun
 
 
@@ -129,6 +129,9 @@ class SpaceShip(pygame.sprite.Sprite):
     def rect(self):
         rect = self.sprite.get_rect()
         rect.x, rect.y = self.position
+        diff = np.array(rect.size) * -0.1
+        diff = diff.astype(int)
+        rect = rect.inflate(*diff)
         return rect
 
     def get_objects(self):
