@@ -74,9 +74,9 @@ class SpaceBagels:
                         self.running = False
                         return
 
-                if event.key in (pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d, pygame.K_SPACE):
+                if event.key in (pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d, pygame.K_SPACE, pygame.K_LALT):
                     self.player_left.process_input(event, Constants.KEYBOARD_MAPPING[event.key])
-                elif event.key in (pygame.K_UP, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT, pygame.K_RETURN):
+                elif event.key in (pygame.K_UP, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT, pygame.K_RETURN, pygame.K_DELETE):
                     self.player_right.process_input(event, Constants.KEYBOARD_MAPPING[event.key])
 
     def tick(self, tick_count):

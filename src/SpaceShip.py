@@ -4,7 +4,7 @@ import numpy as np
 import pygame
 
 from src import Constants
-from src.Weapons import MachineGun
+from src.Weapons import MachineGun, MissileLauncher
 
 
 class SpaceShip(pygame.sprite.Sprite):
@@ -39,10 +39,11 @@ class SpaceShip(pygame.sprite.Sprite):
         self.projectiles = []
         self.effects = []
         self.weapons = []
-        self.weapons.append(
-            MachineGun(self.space_ship_side == self.SPACE_SHIP_IS_RIGHT, Constants.SPACE_SHIP_HEIGHT/10, self.sound))
-        self.weapons.append(
-            MachineGun(self.space_ship_side == self.SPACE_SHIP_IS_RIGHT, -Constants.SPACE_SHIP_HEIGHT/10, self.sound))
+        self.weapons.append([MachineGun(self.space_ship_side == self.SPACE_SHIP_IS_RIGHT, Constants.SPACE_SHIP_HEIGHT/10, self.sound),
+                             MachineGun(self.space_ship_side == self.SPACE_SHIP_IS_RIGHT, -Constants.SPACE_SHIP_HEIGHT/10, self.sound)])
+        self.weapons.append([MissileLauncher(self.space_ship_side == self.SPACE_SHIP_IS_RIGHT, 0, self.sound)])
+        self._active_weapon_idx = 0
+        self.active_weapon = self.weapons[self._active_weapon_idx]
 
     def damage_ship(self, health_percentage_diff):
         self.health_percentage -= health_percentage_diff
@@ -64,9 +65,15 @@ class SpaceShip(pygame.sprite.Sprite):
                 self.target_velocity = self.DEFAULT_VELOCITY * np.array(event.dict['value'])
                 self.target_velocity[1] *= -1
         elif event.type == pygame.JOYBUTTONUP:
-            self.firing = False
+            if event.dict['button'] == 1:
+                self.firing = False
+            elif event.dict['button'] == 2:
+                self._active_weapon_idx += 1
+                self._active_weapon_idx %= len(self.weapons)
+                self.active_weapon = self.weapons[self._active_weapon_idx]
         elif event.type == pygame.JOYBUTTONDOWN:
-            self.firing = True
+            if event.dict['button'] == 1:
+                self.firing = True
         elif event.type == pygame.KEYDOWN:
             if button == button.UP:
                 self.target_velocity[1] = -self.DEFAULT_VELOCITY
@@ -103,7 +110,7 @@ class SpaceShip(pygame.sprite.Sprite):
             self.position = np.clip(new_position, [self.MIDDLE_POS, 0],
                                     np.array(Constants.DESIRED_RESOLUTION) - self.sprite.get_size())
 
-        for weapon in self.weapons:
+        for weapon in self.active_weapon:
             weapon.tick()
 
             if self.firing:
