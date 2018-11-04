@@ -4,6 +4,7 @@ import numpy as np
 import pygame
 
 from src import Constants
+from src.Meteorite import Meteorite
 from src.Weapons import MachineGun, MissileLauncher
 
 
@@ -44,6 +45,8 @@ class SpaceShip(pygame.sprite.Sprite):
         self.weapons.append([MissileLauncher(self.space_ship_side == self.SPACE_SHIP_IS_RIGHT, 0, self.sound)])
         self._active_weapon_idx = 0
         self.active_weapon = self.weapons[self._active_weapon_idx]
+        self.bagel_mode = 0
+        self.previous_move = ''
 
     def damage_ship(self, health_percentage_diff):
         self.health_percentage -= health_percentage_diff
@@ -64,6 +67,17 @@ class SpaceShip(pygame.sprite.Sprite):
             if event.dict['hat'] == 0:
                 self.target_velocity = self.DEFAULT_VELOCITY * np.array(event.dict['value'])
                 self.target_velocity[1] *= -1
+                if event.dict['value'] == (0, 0):
+                    self.register_bagel_move()
+                else:
+                    if event.dict['value'] == (0, 1):
+                        self.previous_move = 'up'
+                    if event.dict['value'] == (0, -1):
+                        self.previous_move = 'down'
+                    if event.dict['value'] == (-1, 0):
+                        self.previous_move = 'left'
+                    if event.dict['value'] == (1, 0):
+                        self.previous_move = 'right'
         elif event.type == pygame.JOYBUTTONUP:
             if event.dict['button'] == 1:
                 self.firing = False
@@ -71,9 +85,13 @@ class SpaceShip(pygame.sprite.Sprite):
                 self._active_weapon_idx += 1
                 self._active_weapon_idx %= len(self.weapons)
                 self.active_weapon = self.weapons[self._active_weapon_idx]
+            self.register_bagel_move()
         elif event.type == pygame.JOYBUTTONDOWN:
-            if event.dict['button'] == 1:
+            if event.dict['button'] == 0:
+                self.previous_move = 'a'
+            elif event.dict['button'] == 1:
                 self.firing = True
+                self.previous_move = 'b'
         elif event.type == pygame.KEYDOWN:
             if button == button.UP:
                 self.target_velocity[1] = -self.DEFAULT_VELOCITY
@@ -92,6 +110,25 @@ class SpaceShip(pygame.sprite.Sprite):
                 self.target_velocity[0] = 0
             if button == Constants.Button.FIRE:
                 self.firing = False
+
+    def register_bagel_move(self):
+        if (self.bagel_mode == 0 and self.previous_move == 'up') or \
+                (self.bagel_mode == 1 and self.previous_move == 'up') or \
+                (self.bagel_mode == 2 and self.previous_move == 'down') or \
+                (self.bagel_mode == 3 and self.previous_move == 'down') or \
+                (self.bagel_mode == 4 and self.previous_move == 'left') or \
+                (self.bagel_mode == 5 and self.previous_move == 'right') or \
+                (self.bagel_mode == 6 and self.previous_move == 'left') or \
+                (self.bagel_mode == 7 and self.previous_move == 'right') or \
+                (self.bagel_mode == 8 and self.previous_move == 'b') or \
+                (self.bagel_mode == 9 and self.previous_move == 'a'):
+            self.bagel_mode += 1
+        if self.bagel_mode == 10:
+            self.activate_bagel_mode()
+
+    def activate_bagel_mode(self):
+        print('Bagel mode activated')
+        Meteorite.METEORITE_FILE_NAME = '/home/munzner/dev/BagelSpace/img/bagel.png'
 
     def calculate_projectile_start_pos(self):
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
