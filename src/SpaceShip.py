@@ -162,8 +162,11 @@ class SpaceShip(pygame.sprite.Sprite):
         if self.ship_destroyed:
             self.explosion.update(False)
 
+        for weapon_set in self.weapons:
+            for weapon in weapon_set:
+                weapon.tick()
+
         for weapon in self.active_weapon:
-            weapon.tick()
 
             if self.firing:
                 projectile = weapon.fire(self.calculate_projectile_start_pos())
