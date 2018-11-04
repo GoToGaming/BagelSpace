@@ -24,44 +24,44 @@ def mock_inertia(request):
 
 def test_left_space_ship_initial_position(test_sprite):
     with pytest.raises(ValueError) as e:
-        SpaceShip((-1,0), SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite)
+        SpaceShip((-1,0), SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite, None)
     with pytest.raises(ValueError) as e:
-        SpaceShip((0,-1), SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite)
+        SpaceShip((0,-1), SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite, None)
     with pytest.raises(ValueError) as e:
-        SpaceShip((-1,-1), SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite)
+        SpaceShip((-1,-1), SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite, None)
 
     with pytest.raises(ValueError) as e:
-        SpaceShip((SpaceShip.MIDDLE_POS,0), SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite)
+        SpaceShip((SpaceShip.MIDDLE_POS,0), SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite, None)
     with pytest.raises(ValueError) as e:
-        SpaceShip((0, src.Constants.DESIRED_RESOLUTION[1]), SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite)
+        SpaceShip((0, src.Constants.DESIRED_RESOLUTION[1]), SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite, None)
     with pytest.raises(ValueError) as e:
-        SpaceShip((SpaceShip.MIDDLE_POS, src.Constants.DESIRED_RESOLUTION[1]), SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite)
+        SpaceShip((SpaceShip.MIDDLE_POS, src.Constants.DESIRED_RESOLUTION[1]), SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite, None)
 
 
 def test_right_space_ship_initial_position(test_sprite):
     with pytest.raises(ValueError) as e:
         SpaceShip((SpaceShip.MIDDLE_POS-1,0),
-                             SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite)
+                             SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite, None)
     with pytest.raises(ValueError) as e:
         SpaceShip((SpaceShip.MIDDLE_POS,-1),
-                             SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite)
+                             SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite, None)
     with pytest.raises(ValueError) as e:
         SpaceShip((SpaceShip.MIDDLE_POS-1,-1),
-                             SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite)
+                             SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite, None)
 
     with pytest.raises(ValueError) as e:
         SpaceShip((src.Constants.DESIRED_RESOLUTION[0], 0),
-                  SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite)
+                  SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite, None)
     with pytest.raises(ValueError) as e:
         SpaceShip((SpaceShip.MIDDLE_POS, src.Constants.DESIRED_RESOLUTION[1]),
-                  SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite)
+                  SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite, None)
     with pytest.raises(ValueError) as e:
         SpaceShip(src.Constants.DESIRED_RESOLUTION,
-                  SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite)
+                  SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite, None)
 
 
 def test_left_space_ship_should_not_move_left(test_sprite):
-    space_ship = SpaceShip((0,0), SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite)
+    space_ship = SpaceShip((0,0), SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite, None)
     move_left_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (-1, 0)})
     space_ship.process_input(move_left_event, None)
     space_ship.tick()
@@ -69,11 +69,11 @@ def test_left_space_ship_should_not_move_left(test_sprite):
 
 
 def test_right_space_ship_should_not_move_left(test_sprite):
-    space_ship = SpaceShip((SpaceShip.MIDDLE_POS,0), SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite)
+    space_ship = SpaceShip((SpaceShip.MIDDLE_POS,0), SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite, None)
 
 
 def test_right_space_ship_should_not_move_left(test_sprite):
-    space_ship = SpaceShip((SpaceShip.MIDDLE_POS, 0), SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite)
+    space_ship = SpaceShip((SpaceShip.MIDDLE_POS, 0), SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite, None)
     move_left_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (-1, 0)})
     space_ship.process_input(move_left_event, None)
     space_ship.tick()
@@ -82,12 +82,12 @@ def test_right_space_ship_should_not_move_left(test_sprite):
 
 def test_left_space_ship_should_not_move_right(test_sprite):
     pos = (SpaceShip.MIDDLE_POS - test_sprite.get_size()[0], 0)
-    space_ship = SpaceShip(pos, SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite)
+    space_ship = SpaceShip(pos, SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite, None)
 
 
 def test_left_space_ship_should_not_move_right(test_sprite):
     pos = (SpaceShip.MIDDLE_POS - test_sprite.get_size()[0], 0)
-    space_ship = SpaceShip(pos, SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite)
+    space_ship = SpaceShip(pos, SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite, None)
     move_right_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (1, 0)})
     space_ship.process_input(move_right_event, None)
     space_ship.tick()
@@ -96,12 +96,12 @@ def test_left_space_ship_should_not_move_right(test_sprite):
 
 def test_right_space_ship_should_not_move_right(test_sprite):
     pos = (src.Constants.DESIRED_RESOLUTION[0] - test_sprite.get_size()[0], 0)
-    space_ship = SpaceShip(pos, SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite)
+    space_ship = SpaceShip(pos, SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite, None)
 
 
 def test_right_space_ship_should_not_move_right(test_sprite):
     pos = (src.Constants.DESIRED_RESOLUTION[0] - test_sprite.get_size()[0], 0)
-    space_ship = SpaceShip(pos, SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite)
+    space_ship = SpaceShip(pos, SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite, None)
     move_right_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (1, 0)})
     space_ship.process_input(move_right_event, None)
     space_ship.tick()
@@ -111,11 +111,11 @@ def test_right_space_ship_should_not_move_right(test_sprite):
 def test_left_space_ship_should_move_left(test_sprite):
     space_ship = SpaceShip((SpaceShip.DEFAULT_VELOCITY,0),
                                       SpaceShip.SPACE_SHIP_IS_LEFT,
-                                      test_sprite)
+                                      test_sprite, None)
 
 
 def test_left_space_ship_should_move_left(test_sprite, mock_inertia):
-    space_ship = SpaceShip((SpaceShip.DEFAULT_VELOCITY,0), SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite)
+    space_ship = SpaceShip((SpaceShip.DEFAULT_VELOCITY,0), SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite, None)
     move_left_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (-1, 0)})
     space_ship.process_input(move_left_event, None)
     space_ship.tick()
@@ -126,7 +126,7 @@ def test_right_space_ship_should_move_left(test_sprite, mock_inertia):
     space_ship = SpaceShip(
         (SpaceShip.MIDDLE_POS+SpaceShip.DEFAULT_VELOCITY,0),
         SpaceShip.SPACE_SHIP_IS_RIGHT,
-        test_sprite)
+        test_sprite, None)
     move_left_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (-1, 0)})
     space_ship.process_input(move_left_event, None)
     space_ship.tick()
@@ -137,7 +137,7 @@ def test_health_percentage_till_death(test_sprite):
     space_ship = SpaceShip(
         (SpaceShip.MIDDLE_POS + SpaceShip.DEFAULT_VELOCITY, 0),
         SpaceShip.SPACE_SHIP_IS_RIGHT,
-        test_sprite)
+        test_sprite, None)
     assert space_ship.health_percentage == 100
 
     assert space_ship.damage_ship(health_percentage_diff=50) is False
@@ -151,7 +151,7 @@ def test_health_increase(test_sprite):
     space_ship = SpaceShip(
         (SpaceShip.MIDDLE_POS + SpaceShip.DEFAULT_VELOCITY, 0),
         SpaceShip.SPACE_SHIP_IS_RIGHT,
-        test_sprite)
+        test_sprite, None)
     space_ship.health_percentage = 50
 
     space_ship.increase_health_percentage(health_percentage_diff=90)

@@ -6,20 +6,20 @@ from pygameMenu.fonts import FONT_8BIT
 from src import Constants, Tools
 from src.SpaceShip import SpaceShip
 from src.Meteorite import MeteoriteController
-import src.Sound as sound
 
 
 class SpaceBagels:
     BACKGROUND_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'background.png')
 
-    def __init__(self, screen, clock):
+    def __init__(self, screen, clock, sound):
         self._screen = screen
         self._clock = clock
+        self._sound = sound
         self.background_sprite = Tools.load_image(SpaceBagels.BACKGROUND_FILE_NAME, Constants.GAME_SCALE)
         player_left_sprite = Tools.load_image(SpaceShip.SPRITE_LEFT_FILE_NAME, fixed_hight_pixels=Constants.SPACE_SHIP_HEIGHT)
-        self.player_left = SpaceShip((200, 360), SpaceShip.SPACE_SHIP_IS_LEFT, player_left_sprite)
+        self.player_left = SpaceShip((200, 360), SpaceShip.SPACE_SHIP_IS_LEFT, player_left_sprite, sound)
         player_right_sprite = Tools.load_image(SpaceShip.SPRITE_RIGHT_FILE_NAME, fixed_hight_pixels=Constants.SPACE_SHIP_HEIGHT)
-        self.player_right = SpaceShip((1000, 360), SpaceShip.SPACE_SHIP_IS_RIGHT, player_right_sprite)
+        self.player_right = SpaceShip((1000, 360), SpaceShip.SPACE_SHIP_IS_RIGHT, player_right_sprite, sound)
         self.meteorite_controller = MeteoriteController()
         self.running = True
         self.game_ended = ''
@@ -30,7 +30,7 @@ class SpaceBagels:
     def main(self):
         self.running = True
         self._clock.tick()
-        sound.start_game_background_music()
+        self._sound.start_game_background_music()
 
         while True:
             playevents = pygame.event.get()

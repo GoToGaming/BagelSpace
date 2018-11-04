@@ -1,37 +1,31 @@
 import os
-import time
-import pygame
 from pygame import mixer
 
 sound_folder_path = os.path.join(os.path.dirname(os.getcwd()), 'sounds')
 
 
-mixer.init()
+class Sound:
+    def __init__(self):
+        self.menu_music_is_playing = False
 
-machine_gun_shot = mixer.Sound(os.path.join(sound_folder_path, 'machinegun-single-shot-9db.wav'))
+        mixer.init()
+        self.machine_gun_shot = mixer.Sound(os.path.join(sound_folder_path, 'machinegun-single-shot-9db.wav'))
 
+    def start_menu_background_music(self):
+        if not self.menu_music_is_playing:
+            file = 'Incoming_Transition.mp3'
+            mixer.music.stop()
+            mixer.music.load(os.path.join(sound_folder_path, "background", file))
+            mixer.music.play()
+            self.menu_music_is_playing = True
 
-menu_music_is_playing = False
-
-
-def start_menu_background_music():
-    global menu_music_is_playing
-    if not menu_music_is_playing:
-        file = 'Incoming_Transition.mp3'
+    def start_game_background_music(self):
+        if not self.menu_music_is_playing:
+            self.menu_music_is_playing = False
+        file = 'Ether_Oar.mp3'
         mixer.music.stop()
         mixer.music.load(os.path.join(sound_folder_path, "background", file))
         mixer.music.play()
-        menu_music_is_playing = True
 
-
-def start_game_background_music():
-    global menu_music_is_playing
-    file = 'Ether_Oar.mp3'
-    mixer.music.stop()
-    mixer.music.load(os.path.join(sound_folder_path, "background", file))
-    mixer.music.play()
-    if not menu_music_is_playing:
-        menu_music_is_playing = False
-
-
-
+    def play_machine_gun_shot(self):
+        self.machine_gun_shot.play()

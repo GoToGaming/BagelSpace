@@ -15,11 +15,12 @@ class SpaceShip(pygame.sprite.Sprite):
     DEFAULT_VELOCITY = Constants.SPACE_SHIP_VELOCITY
     MIDDLE_POS = Constants.DESIRED_RESOLUTION[0] / 2
 
-    def __init__(self, position, space_ship_side, sprite):
+    def __init__(self, position, space_ship_side, sprite, sound):
         super().__init__()
         self.position = np.array(position)
         self.space_ship_side = space_ship_side
         self.sprite = sprite
+        self.sound = sound
         self.health_percentage = 100
         self.ship_destroyed = False
         self.rearming_reload_ticks = 0
@@ -38,8 +39,10 @@ class SpaceShip(pygame.sprite.Sprite):
         self.projectiles = []
         self.effects = []
         self.weapons = []
-        self.weapons.append(MachineGun(self.space_ship_side == self.SPACE_SHIP_IS_RIGHT, Constants.SPACE_SHIP_HEIGHT/10))
-        self.weapons.append(MachineGun(self.space_ship_side == self.SPACE_SHIP_IS_RIGHT, -Constants.SPACE_SHIP_HEIGHT/10))
+        self.weapons.append(
+            MachineGun(self.space_ship_side == self.SPACE_SHIP_IS_RIGHT, Constants.SPACE_SHIP_HEIGHT/10, self.sound))
+        self.weapons.append(
+            MachineGun(self.space_ship_side == self.SPACE_SHIP_IS_RIGHT, -Constants.SPACE_SHIP_HEIGHT/10, self.sound))
 
     def damage_ship(self, health_percentage_diff):
         self.health_percentage -= health_percentage_diff

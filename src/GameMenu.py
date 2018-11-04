@@ -4,17 +4,17 @@ from pygameMenu.locals import *
 import sys
 
 from src import Constants, SpaceBagels
-import src.Sound as sound
 
 
 class GameMenu:
-    def __init__(self, screen, clock):
+    def __init__(self, screen, sound, clock):
         self._screen = screen
+        self._sound = sound
         if pygame.joystick.get_count() < 2:
             self.use_joystick = False
         else:
             self.use_joystick = True
-        self.game = SpaceBagels.SpaceBagels(self._screen, clock)
+        self.game = SpaceBagels.SpaceBagels(self._screen, clock, self._sound)
         self.game._set_input_method(self.use_joystick)
 
         def _main_menu_callback():
@@ -27,7 +27,7 @@ class GameMenu:
 
         def _new_game_callback():
             self.menu.disable()
-            self.game = SpaceBagels.SpaceBagels(self._screen, clock)
+            self.game = SpaceBagels.SpaceBagels(self._screen, clock, self._sound)
             self.game._set_input_method(self.use_joystick)
             self.game.main()
 
@@ -77,8 +77,8 @@ class GameMenu:
         self.menu.add_option('Exit', PYGAME_MENU_EXIT)
 
     def process_inputs(self, events):
-        sound.start_menu_background_music()
         self.menu.enable()
+        self._sound.start_menu_background_music()
         for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()

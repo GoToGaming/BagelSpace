@@ -6,6 +6,7 @@ import pygame
 
 from src.Constants import DESIRED_RESOLUTION
 from src.GameMenu import GameMenu
+from src.Sound import Sound
 
 
 def main():
@@ -20,7 +21,9 @@ def main():
     joysticks = [pygame.joystick.Joystick(idx) for idx in range(pygame.joystick.get_count())]
     for joystick in joysticks:
         joystick.init()
-    menu = GameMenu(screen, clock)
+
+    sound = Sound()
+    menu = GameMenu(screen, sound, clock)
 
     while True:
         menu.process_inputs(pygame.event.get())

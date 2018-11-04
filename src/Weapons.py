@@ -7,11 +7,10 @@ import src.Constants as Constants
 from src.Animation import Animation
 from src.Tools import load_image
 
-import src.Sound as sound
-
 
 class MachineGun:
-    def __init__(self, is_right_player, offset):
+    def __init__(self, is_right_player, offset, sound):
+        self.sound = sound
         self.fire_rate = Constants.MACHINE_GUN_FIRE_RATE
         self.cooldown = self.fire_rate
         self.projectile_speed = Constants.MACHINE_GUN_PROJECTILE_SPEED
@@ -20,7 +19,7 @@ class MachineGun:
 
     def fire(self, position):
         if self.cooldown == 0:
-            sound.machine_gun_shot.play()
+            self.sound.play_machine_gun_shot()
             velocity_x = self.projectile_speed
             if self.is_right_player:
                 velocity_x = -velocity_x
