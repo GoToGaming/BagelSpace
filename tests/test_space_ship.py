@@ -2,7 +2,7 @@ import pygame
 import pytest
 
 import src.Constants
-from src import SpaceBagels
+from src import Main
 from src.SpaceShip import SpaceShip
 
 

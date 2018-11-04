@@ -3,7 +3,7 @@ import pygameMenu
 from pygameMenu.locals import *
 import sys
 
-from src import Constants, Main
+from src import Constants, SpaceBagels
 
 
 class GameMenu:
@@ -13,7 +13,7 @@ class GameMenu:
             self.use_joystick = False
         else:
             self.use_joystick = True
-        self.game = Main.Main(self._screen, clock)
+        self.game = SpaceBagels.SpaceBagels(self._screen, clock)
         self.game._set_input_method(self.use_joystick)
 
         def _main_menu_callback():
@@ -26,7 +26,7 @@ class GameMenu:
 
         def _new_game_callback():
             self.menu.disable()
-            self.game = Main.Main(self._screen, clock)
+            self.game = SpaceBagels.SpaceBagels(self._screen, clock)
             self.game._set_input_method(self.use_joystick)
             self.game.main()
 
