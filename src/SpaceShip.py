@@ -140,8 +140,7 @@ class SpaceShip(pygame.sprite.Sprite):
             self.activate_bagel_mode()
 
     def activate_bagel_mode(self):
-        print('Bagel mode activated')
-        Meteorite.METEORITE_FILE_NAME = '/home/munzner/dev/BagelSpace/img/bagel.png'
+        Meteorite.METEORITE_FILE_NAMES = [os.path.join(os.path.dirname(Meteorite.METEORITE_FILE_NAMES[0]), 'bagel.png')]
 
     def calculate_projectile_start_pos(self):
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
