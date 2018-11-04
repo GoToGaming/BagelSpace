@@ -112,23 +112,26 @@ class SpaceBagels:
 
     def blit(self):
         self._screen.blit(self.background_sprite, (0, 0))
-        self.meteorite_controller.blit(self._screen)
         self.powerup_controller.blit(self._screen)
 
         if self.game_ended:
             if self.game_ended_time + 2500 > pygame.time.get_ticks():
                 if self.game_ended == SpaceShip.SPACE_SHIP_IS_RIGHT:
-                    self.player_left.blit_explosion(self._screen)
                     self.player_right.blit(self._screen)
+                    self.meteorite_controller.blit(self._screen)
+                    self.player_left.blit_explosion(self._screen)
                 else:
-                    self.player_right.blit_explosion(self._screen)
                     self.player_left.blit(self._screen)
+                    self.meteorite_controller.blit(self._screen)
+                    self.player_right.blit_explosion(self._screen)
             else:
+                self.meteorite_controller.blit(self._screen)
                 self._blit_game_ended_screen()
                 self._sound.start_menu_background_music()
         else:
             self.player_left.blit(self._screen)
             self.player_right.blit(self._screen)
+            self.meteorite_controller.blit(self._screen)
             self._blit_status_bar()
             self._blit_buttons()
 
