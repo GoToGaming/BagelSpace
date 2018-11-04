@@ -149,10 +149,10 @@ class Main:
                                 color=Constants.LIGHT_BLUE)
 
     def _detect_collisions(self):
-        self.compute_missile_ship_collisions()
+        self.compute_projectile_ship_collisions()
         self.compute_meteorite_ship_collisions()
-        self.compute_meteorite_missile_collisions()
-        self.compute_missile_missile_collisions()
+        self.compute_meteorite_projectile_collisions()
+        self.compute_projectile_projectile_collisions()
 
         if self.player_left.health_percentage == 0:
             self.game_ended = SpaceShip.SPACE_SHIP_IS_RIGHT
@@ -161,19 +161,19 @@ class Main:
         if self.game_ended:
             self.game_ended_time = pygame.time.get_ticks()
 
-    def compute_missile_ship_collisions(self):
+    def compute_projectile_ship_collisions(self):
         player_left_objects = self.player_left.get_objects()
         player_right_objects = self.player_right.get_objects()
 
         hit_left_player = pygame.sprite.spritecollideany(self.player_left, player_right_objects)
         if hit_left_player:
-            self.player_right.missile_has_collided(hit_left_player)
-            self.player_left.damage_ship(health_percentage_diff=10)
+            self.player_right.projectile_has_collided(hit_left_player)
+            self.player_left.damage_ship(health_percentage_diff=hit_left_player.damage)
 
         hit_right_player = pygame.sprite.spritecollideany(self.player_right, player_left_objects)
         if pygame.sprite.spritecollideany(self.player_right, player_left_objects):
-            self.player_left.missile_has_collided(hit_right_player)
-            self.player_right.damage_ship(health_percentage_diff=10)
+            self.player_left.projectile_has_collided(hit_right_player)
+            self.player_right.damage_ship(health_percentage_diff=hit_right_player.damage)
 
     def compute_meteorite_ship_collisions(self):
         meteorites = self.meteorite_controller.meteorites
@@ -186,36 +186,36 @@ class Main:
         if hit_right_player:
             self.player_right.damage_ship(health_percentage_diff=0.1)
 
-    def compute_meteorite_missile_collisions(self):
-        missiles_left = pygame.sprite.Group(missile for missile in self.player_left.missiles)
-        missiles_right = pygame.sprite.Group(missile for missile in self.player_right.missiles)
+    def compute_meteorite_projectile_collisions(self):
+        projectiles_left = pygame.sprite.Group(projectile for projectile in self.player_left.projectiles)
+        projectiles_right = pygame.sprite.Group(projectile for projectile in self.player_right.projectiles)
         meteorites = pygame.sprite.Group(meteorite for meteorite in self.meteorite_controller.meteorites)
 
-        collision_dict_left = pygame.sprite.groupcollide(meteorites, missiles_left, False, True)
-        collision_dict_right = pygame.sprite.groupcollide(meteorites, missiles_right, False, True)
+        collision_dict_left = pygame.sprite.groupcollide(meteorites, projectiles_left, False, True)
+        collision_dict_right = pygame.sprite.groupcollide(meteorites, projectiles_right, False, True)
 
-        for meteorite, missiles in collision_dict_left.items():
-            for missile in missiles:
-                meteorite.damage_meteorite(50)
-        for meteorite, missiles in collision_dict_right.items():
-            for missile in missiles:
-                meteorite.damage_meteorite(50)
+        for meteorite, projectiles in collision_dict_left.items():
+            for projectile in projectiles:
+                meteorite.damage_meteorite(projectile.damage)
+        for meteorite, projectiles in collision_dict_right.items():
+            for projectile in projectiles:
+                meteorite.damage_meteorite(projectile.damage)
 
         for meteorite in self.meteorite_controller.meteorites.copy():
             if meteorite.health == 0:
                 self.meteorite_controller.meteorites.remove(meteorite)
 
-        self.player_left.missiles = [missile for missile in missiles_left]
-        self.player_right.missiles = [missile for missile in missiles_right]
+        self.player_left.projectiles = [projectile for projectile in projectiles_left]
+        self.player_right.projectiles = [projectile for projectile in projectiles_right]
 
-    def compute_missile_missile_collisions(self):
-        missiles_left = pygame.sprite.Group(missile for missile in self.player_left.missiles)
-        missiles_right = pygame.sprite.Group(missile for missile in self.player_right.missiles)
+    def compute_projectile_projectile_collisions(self):
+        projectiles_left = pygame.sprite.Group(projectile for projectile in self.player_left.projectiles)
+        projectiles_right = pygame.sprite.Group(projectile for projectile in self.player_right.projectiles)
 
-        pygame.sprite.groupcollide(missiles_left, missiles_right, True, True)
+        pygame.sprite.groupcollide(projectiles_left, projectiles_right, True, True)
 
-        self.player_left.missiles = [missile for missile in missiles_left]
-        self.player_right.missiles = [missile for missile in missiles_right]
+        self.player_left.projectiles = [projectile for projectile in projectiles_left]
+        self.player_right.projectiles = [projectile for projectile in projectiles_right]
 
     def _set_input_method(self, use_joystick):
         self.use_joystick = use_joystick
