@@ -28,7 +28,7 @@ class MeteoriteController:
         y = rand.randint(0, Constants.DESIRED_RESOLUTION[1] - Constants.METEORITE_HEIGHT)
         meteorite_speed_range = Constants.MAX_METEORITE_SPEED - Constants.MIN_METEORITE_SPEED
         speed = (rand.random() * meteorite_speed_range) + Constants.MIN_METEORITE_SPEED
-        health = 10**(np.random.exponential(Constants.METEORITE_HEALTH_BETA) + 1)
+        health = np.min([10**(np.random.exponential(Constants.METEORITE_HEALTH_BETA) + 1), Constants.MAX_METEORITE_HEALTH])
         meteorite = Meteorite((x, y), (speed*direction, 0), health)
         self.meteorites.append(meteorite)
 
