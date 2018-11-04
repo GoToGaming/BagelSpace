@@ -46,6 +46,7 @@ class Meteorite(pygame.sprite.Sprite):
         self.position = np.array(pos)
         self.velocity = np.array(velocity)
         self.health = float(health)
+        self.scrape_sound_played = False
 
         self.sprite = Tools.load_image(self.METEORITE_FILE_NAME, fixed_hight_pixels=Constants.METEORITE_HEIGHT)
         alpha = np.log10(self.health)
