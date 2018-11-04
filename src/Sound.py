@@ -31,3 +31,6 @@ class Sound:
 
     def play_machine_gun_shot(self):
         self.machine_gun_shot.play()
+
+    def play_missile_shot(self):
+        self.missile_shot.play()

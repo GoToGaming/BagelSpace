@@ -107,7 +107,7 @@ class MissileLauncher:
 
     def fire(self, position):
         if self.cooldown == 0:
-            # TODO sound
+            self.sound.play_missile_shot()
             velocity_x = self.missile_speed
             if self.is_right_player:
                 velocity_x = -velocity_x
