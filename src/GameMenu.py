@@ -37,6 +37,8 @@ class GameMenu:
                                     menu_alpha=90,
                                     onclose=_resume_callback,
                                     title='SpaceBagels',
+                                    menu_width=Constants.MENU_WIDTH,
+                                    menu_height=Constants.MENU_HEIGHT,
                                     window_width=Constants.DESIRED_RESOLUTION[0],
                                     window_height=Constants.DESIRED_RESOLUTION[1])
 
@@ -46,6 +48,8 @@ class GameMenu:
                                         menu_alpha=90,
                                         onclose=PYGAME_MENU_BACK,
                                         title='Settings',
+                                        menu_width=Constants.MENU_WIDTH,
+                                        menu_height=Constants.MENU_HEIGHT,
                                         window_width=Constants.DESIRED_RESOLUTION[0],
                                         window_height=Constants.DESIRED_RESOLUTION[1])
 

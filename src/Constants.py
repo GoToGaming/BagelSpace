@@ -5,6 +5,8 @@ import pygame
 DESIRED_RESOLUTION = (1280, 720)
 TARGET_FPS = 60
 TARGET_FRAMETIME_MS = 1000. / TARGET_FPS
+MENU_WIDTH = 800
+MENU_HEIGHT = 500
 
 # ############## game play calibration #######################
 
