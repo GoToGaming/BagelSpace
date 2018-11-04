@@ -23,7 +23,7 @@ class Sound:
             self.menu_music_is_playing = True
 
     def start_game_background_music(self):
-        if not self.menu_music_is_playing:
+        if self.menu_music_is_playing:
             self.menu_music_is_playing = False
         file = 'Ether_Oar.mp3'
         mixer.music.stop()

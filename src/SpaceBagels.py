@@ -113,6 +113,7 @@ class SpaceBagels:
 
         if self.game_ended:
             self._blit_game_ended_screen()
+            self._sound.start_menu_background_music()
         else:
             self.player_left.blit(self._screen)
             self.player_right.blit(self._screen)
