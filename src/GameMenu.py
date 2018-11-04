@@ -72,6 +72,22 @@ class GameMenu:
                                    onreturn=None,
                                    onchange=_select_input_method)
 
+        def _select_graphics(method):
+            if method == 'Windowed':
+                screen = pygame.display.set_mode(Constants.DESIRED_RESOLUTION)
+                self = GameMenu(screen, sound, clock)
+            elif method == 'Fullscreen':
+                screen = pygame.display.set_mode(Constants.DESIRED_RESOLUTION, pygame.FULLSCREEN)
+                self = GameMenu(screen, sound, clock)
+            else:
+                raise ValueError
+
+        options = [('Windowed', 'Windowed'), ('Fullscreen', 'Fullscreen')]
+        settings_menu.add_selector('Graphics',
+                                   options,
+                                   onreturn=None,
+                                   onchange=_select_graphics)
+
         self.menu.add_option('New Game', _new_game_callback)
         self.menu.add_option('Settings', settings_menu)
         self.menu.add_option('Exit', PYGAME_MENU_EXIT)
