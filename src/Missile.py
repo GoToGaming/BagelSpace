@@ -1,6 +1,7 @@
+import os
+
 import numpy as np
 import pygame
-import os
 
 from src import Animation, Constants, Tools
 
@@ -27,4 +28,7 @@ class Missile(pygame.sprite.Sprite):
     def rect(self):
         rect = self.animation.get_current_image().get_rect()
         rect.x, rect.y = self.position
+        diff = np.array(rect.size) * -0.1
+        diff = diff.astype(int)
+        rect = rect.inflate(*diff)
         return rect

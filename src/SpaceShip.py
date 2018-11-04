@@ -1,9 +1,9 @@
-import numpy as np
 import os
+
+import numpy as np
 import pygame
 
 from src import Constants
-from src.Missile import Missile
 from src.Weapons import MachineGun
 
 
@@ -35,6 +35,7 @@ class SpaceShip(pygame.sprite.Sprite):
         self.velocity = np.array([0, 0])
         self.firing = False
         self.projectiles = []
+        self.effects = []
         self.weapons = []
         self.weapons.append(MachineGun(self.space_ship_side == self.SPACE_SHIP_IS_RIGHT, Constants.SPACE_SHIP_HEIGHT/10))
         self.weapons.append(MachineGun(self.space_ship_side == self.SPACE_SHIP_IS_RIGHT, -Constants.SPACE_SHIP_HEIGHT/10))
@@ -109,20 +110,28 @@ class SpaceShip(pygame.sprite.Sprite):
             if 0 > projectile.position[0] or projectile.position[0] > Constants.DESIRED_RESOLUTION[0]:
                 self.projectiles.remove(projectile)
 
+        for effect in self.effects.copy():
+            if effect.tick():
+                self.effects.remove(effect)
+
     def projectile_has_collided(self, projectile):
+        self.effects.append(projectile.on_collision_effect(projectile.position))
         self.projectiles.remove(projectile)
 
     def blit(self, screen):
         screen.blit(self.sprite, self.position)
         for projectile in self.projectiles:
             projectile.blit(screen)
-        for weapon in self.weapons:
-            weapon.blit(screen)
+        for effect in self.effects:
+            effect.blit(screen)
 
     @property
     def rect(self):
         rect = self.sprite.get_rect()
         rect.x, rect.y = self.position
+        diff = np.array(rect.size) * -0.1
+        diff = diff.astype(int)
+        rect = rect.inflate(*diff)
         return rect
 
     def get_objects(self):

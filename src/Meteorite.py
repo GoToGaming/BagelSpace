@@ -1,7 +1,8 @@
-import numpy as np
-import pygame
 import os
 import random as rand
+
+import numpy as np
+import pygame
 
 from src import Constants, Tools
 
@@ -28,7 +29,8 @@ class MeteoriteController:
         y = rand.randint(0, Constants.DESIRED_RESOLUTION[1] - Constants.METEORITE_HEIGHT)
         meteorite_speed_range = Constants.MAX_METEORITE_SPEED - Constants.MIN_METEORITE_SPEED
         speed = (rand.random() * meteorite_speed_range) + Constants.MIN_METEORITE_SPEED
-        meteorite = Meteorite((x, y), (speed*direction, 0))
+        health = np.min([10**(np.random.exponential(Constants.METEORITE_HEALTH_BETA) + 1), Constants.MAX_METEORITE_HEALTH])
+        meteorite = Meteorite((x, y), (speed*direction, 0), health)
         self.meteorites.append(meteorite)
 
     def blit(self, screen):
@@ -39,13 +41,17 @@ class MeteoriteController:
 class Meteorite(pygame.sprite.Sprite):
     METEORITE_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'meteorite.png')
 
-    def __init__(self, pos, velocity):
+    def __init__(self, pos, velocity, health):
         super().__init__()
         self.position = np.array(pos)
         self.velocity = np.array(velocity)
-        self.health = Constants.METEORITE_HEALTH
+        self.health = float(health)
 
         self.sprite = Tools.load_image(self.METEORITE_FILE_NAME, fixed_hight_pixels=Constants.METEORITE_HEIGHT)
+        alpha = np.log10(self.health)
+        alpha = np.clip(alpha * 100, Constants.MIN_METEORITE_SPRITE_ALPHA, Constants.MAX_METEORITE_SPRITE_ALPHA)
+        alpha = 255 - alpha
+        self.sprite.fill((alpha, alpha, alpha, alpha), special_flags=pygame.BLEND_MULT)
 
     def tick(self):
         self.position += self.velocity
@@ -57,6 +63,9 @@ class Meteorite(pygame.sprite.Sprite):
     def rect(self):
         rect = self.sprite.get_rect()
         rect.x, rect.y = self.position
+        diff = np.array(rect.size) * -0.1
+        diff = diff.astype(int)
+        rect = rect.inflate(*diff)
         return rect
 
     def damage_meteorite(self, diff):
