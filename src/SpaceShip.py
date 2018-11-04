@@ -105,6 +105,10 @@ class SpaceShip(pygame.sprite.Sprite):
             elif event.dict['button'] == 1:
                 self.firing = True
                 self.previous_move = 'b'
+            elif event.dict['button'] == 6:
+                self.previous_move = 'select'
+            elif event.dict['button'] == 7:
+                self.previous_move = 'start'
         elif event.type == pygame.KEYDOWN:
             if button == button.UP:
                 self.target_velocity[1] = -self.DEFAULT_VELOCITY
@@ -134,9 +138,11 @@ class SpaceShip(pygame.sprite.Sprite):
                 (self.bagel_mode == 6 and self.previous_move == 'left') or \
                 (self.bagel_mode == 7 and self.previous_move == 'right') or \
                 (self.bagel_mode == 8 and self.previous_move == 'b') or \
-                (self.bagel_mode == 9 and self.previous_move == 'a'):
+                (self.bagel_mode == 9 and self.previous_move == 'a') or \
+                (self.bagel_mode == 10 and self.previous_move == 'select') or \
+                (self.bagel_mode == 11 and self.previous_move == 'start'):
             self.bagel_mode += 1
-        if self.bagel_mode == 10:
+        if self.bagel_mode == 12:
             self.activate_bagel_mode()
 
     def activate_bagel_mode(self):
