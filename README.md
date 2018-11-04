@@ -4,7 +4,7 @@
 
 A two-person arcade shooter in pygame
 
-![Gameplay screen capture](gameplay.webm)
+![Gameplay screen capture](gameplay.gif)
 
 You have met your arch enemy
 in the outskirts of a desolate galaxy,

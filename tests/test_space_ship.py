@@ -11,6 +11,17 @@ def test_sprite():
     return pygame.Surface([1, 1])
 
 
+@pytest.fixture(scope='function')
+def mock_inertia(request):
+    initial = src.Constants.SPACE_SHIP_VELOCITY_INERTIA
+    src.Constants.SPACE_SHIP_VELOCITY_INERTIA = 0
+
+    def reset():
+        src.Constants.SPACE_SHIP_VELOCITY_INERTIA = initial
+    request.addfinalizer(reset)
+
+
+
 def test_left_space_ship_initial_position(test_sprite):
     with pytest.raises(ValueError) as e:
         SpaceShip((-1,0), SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite)
@@ -103,7 +114,7 @@ def test_left_space_ship_should_move_left(test_sprite):
                                       test_sprite)
 
 
-def test_left_space_ship_should_move_left(test_sprite):
+def test_left_space_ship_should_move_left(test_sprite, mock_inertia):
     space_ship = SpaceShip((SpaceShip.DEFAULT_VELOCITY,0), SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite)
     move_left_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (-1, 0)})
     space_ship.process_input(move_left_event, None)
@@ -111,7 +122,7 @@ def test_left_space_ship_should_move_left(test_sprite):
     assert all(space_ship.position == [0,0])
 
 
-def test_right_space_ship_should_move_left(test_sprite):
+def test_right_space_ship_should_move_left(test_sprite, mock_inertia):
     space_ship = SpaceShip(
         (SpaceShip.MIDDLE_POS+SpaceShip.DEFAULT_VELOCITY,0),
         SpaceShip.SPACE_SHIP_IS_RIGHT,

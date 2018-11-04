@@ -32,7 +32,8 @@ class SpaceShip(pygame.sprite.Sprite):
                                               np.array(Constants.DESIRED_RESOLUTION) - self.sprite.get_size()])
         if any(self.space_ship_bound[0] > self.position) or any(self.position > self.space_ship_bound[1]):
             raise ValueError
-        self.velocity = np.array([0, 0])
+        self.velocity = np.array([0, 0], dtype=float)
+        self.target_velocity = np.array([0, 0])
         self.firing = False
         self.projectiles = []
         self.effects = []
@@ -57,28 +58,28 @@ class SpaceShip(pygame.sprite.Sprite):
     def process_input(self, event, button):
         if event.type == pygame.JOYHATMOTION:
             if event.dict['hat'] == 0:
-                self.velocity = self.DEFAULT_VELOCITY * np.array(event.dict['value'])
-                self.velocity[1] *= -1
+                self.target_velocity = self.DEFAULT_VELOCITY * np.array(event.dict['value'])
+                self.target_velocity[1] *= -1
         elif event.type == pygame.JOYBUTTONUP:
             self.firing = False
         elif event.type == pygame.JOYBUTTONDOWN:
             self.firing = True
         elif event.type == pygame.KEYDOWN:
             if button == button.UP:
-                self.velocity[1] = -self.DEFAULT_VELOCITY
+                self.target_velocity[1] = -self.DEFAULT_VELOCITY
             elif button == Constants.Button.DOWN:
-                self.velocity[1] = self.DEFAULT_VELOCITY
+                self.target_velocity[1] = self.DEFAULT_VELOCITY
             if button == Constants.Button.LEFT:
-                self.velocity[0] = -self.DEFAULT_VELOCITY
+                self.target_velocity[0] = -self.DEFAULT_VELOCITY
             elif button == Constants.Button.RIGHT:
-                self.velocity[0] = self.DEFAULT_VELOCITY
+                self.target_velocity[0] = self.DEFAULT_VELOCITY
             if button == Constants.Button.FIRE:
                 self.firing = True
         elif event.type == pygame.KEYUP:
             if button in (Constants.Button.UP, Constants.Button.DOWN):
-                self.velocity[1] = 0
+                self.target_velocity[1] = 0
             if button in (Constants.Button.LEFT, Constants.Button.RIGHT):
-                self.velocity[0] = 0
+                self.target_velocity[0] = 0
             if button == Constants.Button.FIRE:
                 self.firing = False
 
@@ -89,6 +90,8 @@ class SpaceShip(pygame.sprite.Sprite):
             return self.position + np.array([0, int(self.sprite.get_size()[1] / 2)])
 
     def tick(self):
+        self.velocity *= Constants.SPACE_SHIP_VELOCITY_INERTIA
+        self.velocity += (1 - Constants.SPACE_SHIP_VELOCITY_INERTIA) * self.target_velocity
         new_position = self.position + self.velocity
         if self.space_ship_side == self.SPACE_SHIP_IS_LEFT:
             self.position = np.clip(new_position, [0, 0],
@@ -114,8 +117,8 @@ class SpaceShip(pygame.sprite.Sprite):
             if effect.tick():
                 self.effects.remove(effect)
 
-    def projectile_has_collided(self, projectile):
-        self.effects.append(projectile.on_collision_effect(projectile.position))
+    def projectile_has_collided(self, projectile, is_meteoroid_collision):
+        self.effects.append(projectile.on_collision_effect(projectile.position, is_meteoroid_collision))
         self.projectiles.remove(projectile)
 
     def blit(self, screen):
