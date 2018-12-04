@@ -16,8 +16,10 @@ class PowerUpController:
     ticks_since_last_powerup = 0
 
     def __init__(self, sound):
-        self.switch = rand.choice([-1,1])
+        self.switch = rand.choice([-1, 1])
         self.sound = sound
+        power_up_file_path = os.path.join(os.path.dirname(__file__), '..', 'img', 'blue_powerup')
+        self.power_up_image = load_image(power_up_file_path, Constants.GAME_SCALE, animation=True)
 
     def tick(self):
         self.ticks_since_last_powerup += 1
@@ -36,7 +38,7 @@ class PowerUpController:
         y = rand.randint(100, Constants.DESIRED_RESOLUTION[1]-100)
         direction = self.switch * Constants.POWERUP_X_SPEED
         self.switch *= -1
-        powerup = PowerUp((x, y), direction, self.sound)
+        powerup = PowerUp((x, y), direction, self.sound, self.power_up_image)
         powerup.position = np.array((powerup.position[0]-powerup.animation.get_current_image().get_size()[0], y))
         self.powerups.append(powerup)
 
@@ -49,12 +51,11 @@ class PowerUpController:
 
 
 class PowerUp(pygame.sprite.Sprite):
-    POWERUP_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'blue_powerup')
 
-    def __init__(self, position, direction, sound):
+    def __init__(self, position, direction, sound, power_up_image):
         super().__init__()
 
-        self.animation = Animation(load_image(self.POWERUP_FILE_NAME, Constants.GAME_SCALE, animation=True), 5)
+        self.animation = Animation(power_up_image, 5)
 
         self.position = position
         self.velocity = np.array((direction, 0))

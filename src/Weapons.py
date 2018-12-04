@@ -16,6 +16,8 @@ class MachineGun:
         self.projectile_speed = Constants.MACHINE_GUN_PROJECTILE_SPEED
         self.is_right_player = is_right_player
         self.offset = offset
+        machine_gun_projectile_image_path = os.path.join(os.path.dirname(__file__), '..', 'img', 'machine_gun_bullet')
+        self.machine_gun_projectile_image = load_image(machine_gun_projectile_image_path, Constants.GAME_SCALE, animation=True, flip_x=self.is_right_player)
 
     def fire(self, position):
         if self.cooldown == 0:
@@ -24,7 +26,7 @@ class MachineGun:
             if self.is_right_player:
                 velocity_x = -velocity_x
             position[1] -= self.offset
-            projectile = MachineGunProjectile(position, (velocity_x, 0), is_player_right=self.is_right_player)
+            projectile = MachineGunProjectile(position, (velocity_x, 0), self.machine_gun_projectile_image)
             self.cooldown = self.fire_rate
             return projectile
         return None
@@ -35,12 +37,10 @@ class MachineGun:
 
 
 class MachineGunProjectile(pygame.sprite.Sprite):
-    MACHINE_GUN_PROJECTILE_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'machine_gun_bullet')
 
-    def __init__(self, position, velocity, is_player_right):
+    def __init__(self, position, velocity, machine_gun_projectile_image):
         super().__init__()
-        self.animation = Animation(load_image(self.MACHINE_GUN_PROJECTILE_FILE_NAME, Constants.GAME_SCALE,
-                                              animation=True, flip_x=is_player_right), 10)
+        self.animation = Animation(machine_gun_projectile_image, 10)
         self.position = np.array(position)
         self.position[1] -= int(self.animation.get_current_image().get_height() / 2)
         self.velocity = velocity
@@ -104,6 +104,8 @@ class MissileLauncher:
         self.missile_speed = Constants.MACHINE_GUN_PROJECTILE_SPEED
         self.is_right_player = is_right_player
         self.offset = offset
+        missile_image_path = os.path.join(os.path.dirname(__file__), '..', 'img', 'rocket')
+        self.missile_image = load_image(missile_image_path, Constants.GAME_SCALE, animation=True, flip_x=self.is_right_player)
 
     def fire(self, position):
         if self.cooldown == 0:
@@ -112,7 +114,7 @@ class MissileLauncher:
             if self.is_right_player:
                 velocity_x = -velocity_x
             position[1] -= self.offset
-            projectile = Missile(position, (velocity_x, 0), is_player_right=self.is_right_player)
+            projectile = Missile(position, (velocity_x, 0), self.missile_image)
             self.cooldown = self.fire_rate
             return projectile
         return None
@@ -123,12 +125,10 @@ class MissileLauncher:
 
 
 class Missile(pygame.sprite.Sprite):
-    MISSILE_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'rocket')
 
-    def __init__(self, pos, velocity, is_player_right):
+    def __init__(self, pos, velocity, missile_image):
         super().__init__()
-        self.animation = Animation(load_image(self.MISSILE_FILE_NAME, Constants.GAME_SCALE,
-                                              animation=True, flip_x=is_player_right), 4)
+        self.animation = Animation(missile_image, 4)
 
         self.position = np.array(pos)
         self.position[1] -= int(self.animation.get_current_image().get_height() / 2)
