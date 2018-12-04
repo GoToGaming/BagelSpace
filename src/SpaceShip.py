@@ -14,8 +14,8 @@ from src.Animation import Animation
 class SpaceShip(pygame.sprite.Sprite):
     SPACE_SHIP_IS_LEFT = 'RED'
     SPACE_SHIP_IS_RIGHT = 'BLUE'
-    SPRITE_LEFT_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'red_ship_1.png')
-    SPRITE_RIGHT_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'blue_ship.png')
+    SPRITE_LEFT_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'red_ship_borderless.png')
+    SPRITE_RIGHT_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'blue_ship_borderless.png')
     EXPLOSION_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'big_explosion')
     DEFAULT_VELOCITY = Constants.SPACE_SHIP_VELOCITY
     MIDDLE_POS = Constants.DESIRED_RESOLUTION[0] / 2
