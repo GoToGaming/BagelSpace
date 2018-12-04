@@ -85,4 +85,4 @@ class PowerUp(pygame.sprite.Sprite):
 
     def collected(self, player):
         player.increase_health_percentage(Constants.POWERUP_HEALTH)
-        self.sound.play_heal()
+        self.sound.heal.play()

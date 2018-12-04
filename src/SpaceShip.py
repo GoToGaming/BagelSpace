@@ -66,6 +66,7 @@ class SpaceShip(pygame.sprite.Sprite):
         if self.health_percentage <= 0:
             self.health_percentage = 0
             self.ship_destroyed = True
+            self.sound.ship_explosion.play()
         return self.ship_destroyed
 
     def increase_health_percentage(self, health_percentage_diff):

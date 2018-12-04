@@ -246,7 +246,7 @@ class SpaceBagels:
         for collision in collisions:
             self.player_left.damage_ship(health_percentage_diff=0.1)
             if not collision.scrape_sound_played:
-                self._sound.play_scrape_asteroid()
+                self._sound.scrape_asteroid.play()
                 collision.scrape_sound_played = True
                 self.player_left.velocity /= 4
                 collision.velocity /= 2
@@ -255,7 +255,7 @@ class SpaceBagels:
         for collision in collisions:
             self.player_right.damage_ship(health_percentage_diff=0.1)
             if not collision.scrape_sound_played:
-                self._sound.play_scrape_asteroid()
+                self._sound.scrape_asteroid.play()
                 collision.scrape_sound_played = True
                 self.player_right.velocity /= 4
                 collision.velocity /= 2

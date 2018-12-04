@@ -14,6 +14,7 @@ class Sound:
         self.missile_shot = mixer.Sound(os.path.join(sound_folder_path, 'missile-shot.wav'))
         self.heal = mixer.Sound(os.path.join(sound_folder_path, 'heal.wav'))
         self.scrape_asteroid = mixer.Sound(os.path.join(sound_folder_path, 'scrape-asteroid-short.wav'))
+        self.ship_explosion = mixer.Sound(os.path.join(sound_folder_path, 'ship-explosion-short.wav'))
 
     def start_menu_background_music(self):
         if not self.menu_music_is_playing:
@@ -30,15 +31,3 @@ class Sound:
         mixer.music.stop()
         mixer.music.load(os.path.join(sound_folder_path, "background", file))
         mixer.music.play(loops=100)
-
-    def play_machine_gun_shot(self):
-        self.machine_gun_shot.play()
-
-    def play_missile_shot(self):
-        self.missile_shot.play()
-
-    def play_heal(self):
-        self.heal.play()
-
-    def play_scrape_asteroid(self):
-        self.scrape_asteroid.play()

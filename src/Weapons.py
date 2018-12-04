@@ -19,7 +19,7 @@ class MachineGun:
 
     def fire(self, position):
         if self.cooldown == 0:
-            self.sound.play_machine_gun_shot()
+            self.sound.machine_gun_shot.play()
             velocity_x = self.projectile_speed
             if self.is_right_player:
                 velocity_x = -velocity_x
@@ -107,7 +107,7 @@ class MissileLauncher:
 
     def fire(self, position):
         if self.cooldown == 0:
-            self.sound.play_missile_shot()
+            self.sound.missile_shot.play()
             velocity_x = self.missile_speed
             if self.is_right_player:
                 velocity_x = -velocity_x
