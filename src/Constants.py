@@ -48,18 +48,20 @@ class Button(Enum):
     SWITCH = 5
 
 
-KEYBOARD_MAPPING = {pygame.K_UP: Button.UP,
-                    pygame.K_w: Button.UP,
-                    pygame.K_DOWN: Button.DOWN,
-                    pygame.K_s: Button.DOWN,
-                    pygame.K_LEFT: Button.LEFT,
-                    pygame.K_a: Button.LEFT,
-                    pygame.K_RIGHT: Button.RIGHT,
-                    pygame.K_d: Button.RIGHT,
-                    pygame.K_SPACE: Button.FIRE,
-                    pygame.K_RETURN: Button.FIRE,
-                    pygame.K_LALT: Button.SWITCH,
-                    pygame.K_DELETE: Button.SWITCH}
+KEYBOARD_MAPPING_LEFT = {pygame.K_w: Button.UP,
+                         pygame.K_s: Button.DOWN,
+                         pygame.K_a: Button.LEFT,
+                         pygame.K_d: Button.RIGHT,
+                         pygame.K_SPACE: Button.FIRE,
+                         pygame.K_LALT: Button.SWITCH}
+
+KEYBOARD_MAPPING_RIGHT = {pygame.K_UP: Button.UP,
+                          pygame.K_DOWN: Button.DOWN,
+                          pygame.K_LEFT: Button.LEFT,
+                          pygame.K_RIGHT: Button.RIGHT,
+                          pygame.K_RETURN: Button.FIRE,
+                          pygame.K_DELETE: Button.SWITCH}
+
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)

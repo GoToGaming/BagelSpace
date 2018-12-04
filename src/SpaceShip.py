@@ -121,6 +121,10 @@ class SpaceShip(pygame.sprite.Sprite):
                 self.target_velocity[0] = self.DEFAULT_VELOCITY
             if button == Constants.Button.FIRE:
                 self.firing = True
+            elif button == Constants.Button.SWITCH:
+                self._active_weapon_idx += 1
+                self._active_weapon_idx %= len(self.weapons)
+                self.active_weapon = self.weapons[self._active_weapon_idx]
         elif event.type == pygame.KEYUP:
             if button in (Constants.Button.UP, Constants.Button.DOWN):
                 self.target_velocity[1] = 0
