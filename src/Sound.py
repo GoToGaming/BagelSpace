@@ -11,9 +11,9 @@ class Sound:
         mixer.init()
         mixer.set_num_channels(20)
         self.machine_gun_shot = mixer.Sound(os.path.join(sound_folder_path, 'machinegun-single-shot-15db.wav'))
-        self.missile_shot = mixer.Sound(os.path.join(sound_folder_path, 'missile-shot.wav'))
+        self.missile_shot = mixer.Sound(os.path.join(sound_folder_path, 'missile-shot+3db.wav'))
         self.heal = mixer.Sound(os.path.join(sound_folder_path, 'heal.wav'))
-        self.scrape_asteroid = mixer.Sound(os.path.join(sound_folder_path, 'scrape-asteroid-short.wav'))
+        self.scrape_asteroid = mixer.Sound(os.path.join(sound_folder_path, 'asteroid-hit-9db.wav'))
         self.ship_explosion = mixer.Sound(os.path.join(sound_folder_path, 'ship-explosion-short.wav'))
 
     def start_menu_background_music(self):

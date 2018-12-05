@@ -248,8 +248,8 @@ class SpaceBagels:
             if not collision.scrape_sound_played:
                 self._sound.scrape_asteroid.play()
                 collision.scrape_sound_played = True
-                self.player_left.velocity /= 4
-                collision.velocity /= 2
+                self.player_left.velocity /= 6
+                collision.velocity /= 3
 
         collisions = pygame.sprite.spritecollide(self.player_right, meteorites, False)
         for collision in collisions:
@@ -257,8 +257,8 @@ class SpaceBagels:
             if not collision.scrape_sound_played:
                 self._sound.scrape_asteroid.play()
                 collision.scrape_sound_played = True
-                self.player_right.velocity /= 4
-                collision.velocity /= 2
+                self.player_right.velocity /= 6
+                collision.velocity /= 3
 
     def compute_meteorite_projectile_collisions(self):
         projectiles_left = pygame.sprite.Group(projectile for projectile in self.player_left.projectiles)
