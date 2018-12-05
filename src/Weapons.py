@@ -68,20 +68,24 @@ class MachineGunProjectile(pygame.sprite.Sprite):
 
 class MachineGunImpactEffect(pygame.sprite.Sprite):
     MACHINE_GUN_IMPACT_EFFECT_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'mg_impact')
+    machine_gun_ship_impact_image = None
     MACHINE_GUN_IMPACT_METEOROID_EFFECT_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'mg_impact_met')
+    machine_gun_meteoroid_impact_image = None
 
     def __init__(self, position, is_meteoroid_collision):
         super().__init__()
 
         self.effect_speed = 2
         if is_meteoroid_collision:
-            self.animation = Animation(
-                load_image(self.MACHINE_GUN_IMPACT_METEOROID_EFFECT_FILE_NAME, Constants.GAME_SCALE,
-                           animation=True), self.effect_speed)
+            if not MachineGunImpactEffect.machine_gun_meteoroid_impact_image:
+                MachineGunImpactEffect.machine_gun_meteoroid_impact_image = load_image(self.MACHINE_GUN_IMPACT_METEOROID_EFFECT_FILE_NAME,
+                                                                                       Constants.GAME_SCALE, animation=True)
+            self.animation = Animation(MachineGunImpactEffect.machine_gun_meteoroid_impact_image, self.effect_speed)
         else:
-            self.animation = Animation(
-                load_image(self.MACHINE_GUN_IMPACT_EFFECT_FILE_NAME, Constants.GAME_SCALE,
-                           animation=True), self.effect_speed)
+            if not MachineGunImpactEffect.machine_gun_ship_impact_image:
+                MachineGunImpactEffect.machine_gun_ship_impact_image = load_image(self.MACHINE_GUN_IMPACT_EFFECT_FILE_NAME,
+                                                                                  Constants.GAME_SCALE, animation=True)
+            self.animation = Animation(MachineGunImpactEffect.machine_gun_ship_impact_image, self.effect_speed)
 
         self.effect_counter = self.effect_speed * len(self.animation.animation)
         self.position = position
@@ -156,22 +160,25 @@ class Missile(pygame.sprite.Sprite):
 
 
 class MissileImpact(pygame.sprite.Sprite):
-    # TODO impacts
-    MACHINE_GUN_IMPACT_EFFECT_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'mg_impact')
-    MACHINE_GUN_IMPACT_METEOROID_EFFECT_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'mg_impact_met')
+    MISSILE_IMPACT_EFFECT_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'mg_impact')
+    missile_ship_impact_image = None
+    MISSILE_IMPACT_METEOROID_EFFECT_FILE_NAME = os.path.join(os.path.dirname(__file__), '..', 'img', 'mg_impact_met')
+    missile_meteoroid_impact_image = None
 
     def __init__(self, position, is_meteoroid_collision):
         super().__init__()
 
         self.effect_speed = 2
         if is_meteoroid_collision:
-            self.animation = Animation(
-                load_image(self.MACHINE_GUN_IMPACT_METEOROID_EFFECT_FILE_NAME, Constants.GAME_SCALE,
-                           animation=True), self.effect_speed)
+            if not MissileImpact.missile_meteoroid_impact_image:
+                MissileImpact.missile_meteoroid_impact_image = load_image(self.MISSILE_IMPACT_METEOROID_EFFECT_FILE_NAME,
+                                                                          Constants.GAME_SCALE, animation=True)
+            self.animation = Animation(MissileImpact.missile_meteoroid_impact_image, self.effect_speed)
         else:
-            self.animation = Animation(
-                load_image(self.MACHINE_GUN_IMPACT_EFFECT_FILE_NAME, Constants.GAME_SCALE,
-                           animation=True), self.effect_speed)
+            if not MissileImpact.missile_ship_impact_image:
+                MissileImpact.missile_ship_impact_image = load_image(self.MISSILE_IMPACT_EFFECT_FILE_NAME,
+                                                                     Constants.GAME_SCALE, animation=True)
+            self.animation = Animation(MissileImpact.missile_ship_impact_image, self.effect_speed)
 
         self.effect_counter = self.effect_speed * len(self.animation.animation)
         self.position = position
