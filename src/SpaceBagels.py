@@ -140,20 +140,26 @@ class SpaceBagels:
         rect = pygame.Rect(res/8, res*(6/8))
         self._screen.fill((0, 0, 0), rect)
         winner = self.game_ended
-        font_size = 60
+        font_size_heading = 80
+        font_size = 50
+        if winner == 'BLUE':
+            text_color = Constants.BLUE
+        else:
+            text_color = Constants.RED
+
         self.draw_text_centered('Game over',
-                                font_size,
+                                font_size_heading,
                                 Constants.DESIRED_RESOLUTION[0] / 2,
-                                Constants.DESIRED_RESOLUTION[1] / 2 - font_size,
+                                Constants.DESIRED_RESOLUTION[1] / 2 - font_size_heading,
                                 color=Constants.WHITE)
-        self.draw_text_centered('Winner is {}'.format(winner),
+        self.draw_text_centered(f'{winner} is the winner',
                                 font_size,
                                 Constants.DESIRED_RESOLUTION[0] / 2,
                                 Constants.DESIRED_RESOLUTION[1] / 2,
-                                color=Constants.WHITE)
+                                color=text_color)
         if self.game_ended_time + 5000 < pygame.time.get_ticks():
             font_size = 30
-            self.draw_text_centered('Press any key to return to menu'.format(winner),
+            self.draw_text_centered('Press any key to return to menu',
                                     font_size,
                                     Constants.DESIRED_RESOLUTION[0] / 2,
                                     Constants.DESIRED_RESOLUTION[1] / 2 + 3 * font_size,
