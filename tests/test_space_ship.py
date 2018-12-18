@@ -90,54 +90,65 @@ def test_right_space_ship_initial_position(test_sprite, mock_image):
                   SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite, None)
 
 
-def test_left_space_ship_should_not_move_left(test_sprite, mock_image):
+move_left_events = [
+    pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (-1, 0)}),
+    pygame.event.Event(pygame.JOYAXISMOTION, {'joy': 0, 'axis': 0, 'value': -1})
+]
+
+move_right_events = [
+    pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (1, 0)}),
+    pygame.event.Event(pygame.JOYAXISMOTION, {'joy': 0, 'axis': 0, 'value': 1})
+]
+
+
+@pytest.mark.parametrize("move_left_event", move_left_events)
+def test_left_space_ship_should_not_move_left(test_sprite, mock_image, move_left_event):
     space_ship = SpaceShip((0,0), SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite, None)
-    move_left_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (-1, 0)})
     space_ship.process_input(move_left_event, None)
     space_ship.tick()
     assert all(space_ship.position == [0,0])
 
 
-def test_right_space_ship_should_not_move_left(test_sprite, mock_image):
+@pytest.mark.parametrize("move_left_event", move_left_events)
+def test_right_space_ship_should_not_move_left(test_sprite, mock_image, move_left_event):
     space_ship = SpaceShip((SpaceShip.MIDDLE_POS, 0), SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite, None)
-    move_left_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (-1, 0)})
     space_ship.process_input(move_left_event, None)
     space_ship.tick()
     assert all(space_ship.position == [SpaceShip.MIDDLE_POS,0])
 
 
-def test_left_space_ship_should_not_move_right(test_sprite, mock_image):
+@pytest.mark.parametrize("move_right_event", move_right_events)
+def test_left_space_ship_should_not_move_right(test_sprite, mock_image, move_right_event):
     pos = (SpaceShip.MIDDLE_POS - test_sprite.get_size()[0], 0)
     space_ship = SpaceShip(pos, SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite, None)
-    move_right_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (1, 0)})
     space_ship.process_input(move_right_event, None)
     space_ship.tick()
     assert all(space_ship.position == pos)
 
 
-def test_right_space_ship_should_not_move_right(test_sprite, mock_image):
+@pytest.mark.parametrize("move_right_event", move_right_events)
+def test_right_space_ship_should_not_move_right(test_sprite, mock_image, move_right_event):
     pos = (src.Constants.DESIRED_RESOLUTION[0] - test_sprite.get_size()[0], 0)
     space_ship = SpaceShip(pos, SpaceShip.SPACE_SHIP_IS_RIGHT, test_sprite, None)
-    move_right_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (1, 0)})
     space_ship.process_input(move_right_event, None)
     space_ship.tick()
     assert all(space_ship.position == pos)
 
 
-def test_left_space_ship_should_move_left(test_sprite, mock_inertia, mock_image):
+@pytest.mark.parametrize("move_left_event", move_left_events)
+def test_left_space_ship_should_move_left(test_sprite, mock_inertia, mock_image, move_left_event):
     space_ship = SpaceShip((SpaceShip.DEFAULT_VELOCITY,0), SpaceShip.SPACE_SHIP_IS_LEFT, test_sprite, None)
-    move_left_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (-1, 0)})
     space_ship.process_input(move_left_event, None)
     space_ship.tick()
     assert all(space_ship.position == [0,0])
 
 
-def test_right_space_ship_should_move_left(test_sprite, mock_inertia, mock_image):
+@pytest.mark.parametrize("move_left_event", move_left_events)
+def test_right_space_ship_should_move_left(test_sprite, mock_inertia, mock_image, move_left_event):
     space_ship = SpaceShip(
         (SpaceShip.MIDDLE_POS+SpaceShip.DEFAULT_VELOCITY,0),
         SpaceShip.SPACE_SHIP_IS_RIGHT,
         test_sprite, None)
-    move_left_event = pygame.event.Event(pygame.JOYHATMOTION, {'joy': 0, 'hat': 0, 'value': (-1, 0)})
     space_ship.process_input(move_left_event, None)
     space_ship.tick()
     assert all(space_ship.position == [SpaceShip.MIDDLE_POS,0])

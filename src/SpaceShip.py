@@ -92,6 +92,9 @@ class SpaceShip(pygame.sprite.Sprite):
                         self.previous_move = 'left'
                     if event.dict['value'] == (1, 0):
                         self.previous_move = 'right'
+        elif event.type == pygame.JOYAXISMOTION:
+            if event.dict['axis'] == 0:
+                self.target_velocity[0] = self.DEFAULT_VELOCITY * event.dict['value']
         elif event.type == pygame.JOYBUTTONUP:
             if event.dict['button'] == 1:
                 self.firing = False
