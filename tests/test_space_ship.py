@@ -143,11 +143,22 @@ def test_right_space_ship_should_move_left(test_sprite, mock_inertia, mock_image
     assert all(space_ship.position == [SpaceShip.MIDDLE_POS,0])
 
 
+class FakeSoundArtifact(object):
+    def play(self):
+        pass
+
+
+class FakeSound(object):
+    def __init__(self):
+        self.ship_explosion = FakeSoundArtifact()
+
+
 def test_health_percentage_till_death(test_sprite, mock_image):
     space_ship = SpaceShip(
         (SpaceShip.MIDDLE_POS + SpaceShip.DEFAULT_VELOCITY, 0),
         SpaceShip.SPACE_SHIP_IS_RIGHT,
-        test_sprite, None)
+        test_sprite,
+        FakeSound())
     assert space_ship.health_percentage == 100
 
     assert space_ship.damage_ship(health_percentage_diff=50) is False
