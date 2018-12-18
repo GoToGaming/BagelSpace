@@ -25,6 +25,9 @@ Do you really want to know? Go ahead and find out. ;)
 ## Installation
 
 You need at least Python 3.6 to run SpaceBagels.
+Also, your need to install PyGame on your system
+(e.g. for Debian `sudo apt-get install python3-pygame`).
+
 To install the game you can download
 one of the release packages or check out
 this repository. Then run pip in the target directory, e.g.

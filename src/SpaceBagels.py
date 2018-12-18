@@ -157,12 +157,12 @@ class SpaceBagels:
                                     color=Constants.WHITE)
 
     def _blit_status_bar(self):
-        self.draw_text_centered(f'{int(np.ceil(self.player_left.health_percentage))} HP',
+        self.draw_text_centered('{} HP'.format(int(np.ceil(self.player_left.health_percentage))),
                                 30,
                                 Constants.DESIRED_RESOLUTION[0] / 4,
                                 15,
                                 color=Constants.RED)
-        self.draw_text_centered(f'{int(np.ceil(self.player_right.health_percentage))} HP',
+        self.draw_text_centered('{} HP'.format(int(np.ceil(self.player_right.health_percentage))),
                                 30,
                                 3 * Constants.DESIRED_RESOLUTION[0] / 4,
                                 15,
